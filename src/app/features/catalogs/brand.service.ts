@@ -7,6 +7,7 @@ interface BrandRow {
   id: string;
   name: string;
   supplier_id: string;
+  image_path: string | null;
   created_at: string;
   updated_at: string;
   supplier_name?: string;
@@ -43,20 +44,25 @@ export class BrandService {
     return rows[0] ? this.mapWithSupplier(rows[0]) : null;
   }
 
-  async create(input: BrandInput): Promise<string> {
-    const id = createId();
+  async create(input: BrandInput, id: string = createId()): Promise<string> {
     const now = new Date().toISOString();
     await this.db.run(
-      `INSERT INTO brands (id, name, supplier_id, created_at, updated_at) VALUES (?,?,?,?,?);`,
-      [id, input.name.trim(), input.supplierId, now, now]
+      `INSERT INTO brands (id, name, supplier_id, image_path, created_at, updated_at) VALUES (?,?,?,?,?,?);`,
+      [id, input.name.trim(), input.supplierId, input.imagePath?.trim() || null, now, now]
     );
     return id;
   }
 
   async update(id: string, input: BrandInput): Promise<void> {
     await this.db.run(
-      `UPDATE brands SET name=?, supplier_id=?, updated_at=? WHERE id=?;`,
-      [input.name.trim(), input.supplierId, new Date().toISOString(), id]
+      `UPDATE brands SET name=?, supplier_id=?, image_path=?, updated_at=? WHERE id=?;`,
+      [
+        input.name.trim(),
+        input.supplierId,
+        input.imagePath?.trim() || null,
+        new Date().toISOString(),
+        id,
+      ]
     );
   }
 
@@ -76,6 +82,7 @@ export class BrandService {
       id: row.id,
       name: row.name,
       supplierId: row.supplier_id,
+      imagePath: row.image_path,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     };

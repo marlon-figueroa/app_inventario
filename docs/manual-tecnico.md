@@ -11,8 +11,8 @@ Inventario es una app **offline-first** para **gestión de stock**: productos po
 | Nombre | Inventario |
 | Paquete Android | `com.mfigueroa.inventario` |
 | Idioma / locale | `es-MX` |
-| Base de datos | `inventario` (esquema **v2**) |
-| Respaldo JSON | `schemaVersion` **2** |
+| Base de datos | `inventario` (esquema **v3**) |
+| Respaldo JSON | `schemaVersion` **3** (importa v2) |
 
 ## 2. Stack
 
@@ -28,7 +28,7 @@ Inventario es una app **offline-first** para **gestión de stock**: productos po
 `src/main.ts` registra `es-MX` y espera:
 
 1. `ThemeService.initialize()`
-2. `DatabaseService.initialize()` — jeep-sqlite en web, migraciones (`user_version` → 2)
+2. `DatabaseService.initialize()` — jeep-sqlite en web, migraciones incrementales (`user_version` → 3)
 
 ## 4. Estructura del código
 
@@ -57,9 +57,12 @@ src/app/
 | `/tabs/productos/nuevo` | Alta de producto |
 | `/tabs/productos/:id` | Detalle + accesos a movimientos |
 | `/tabs/productos/:id/editar` | Edición |
-| `/tabs/movimientos` | Lista |
-| `/tabs/movimientos/nuevo` | Alta (`?productId=` y `?type=` opcionales) |
-| `/tabs/movimientos/:id/editar` | Edición |
+| `/tabs/operaciones` | Ventas, compras y movimientos |
+| `/tabs/operaciones/venta/nueva` | Punto de venta (ticket) |
+| `/tabs/operaciones/compra/nueva` | Compra multi-partida |
+| `/tabs/operaciones/documento/:id` | Detalle de ticket / compra |
+| `/tabs/operaciones/movimientos/nuevo` | Alta (`?productId=` y `?type=` opcionales) |
+| `/tabs/operaciones/movimientos/:id/editar` | Edición |
 | `/tabs/reportes` | Totales por periodo |
 | `/tabs/ajustes` | Tema, respaldo, enlaces a catálogos |
 | `/tabs/ajustes/proveedores` | CRUD proveedores |
@@ -76,8 +79,12 @@ src/app/
 
 ### Producto
 
-SKU único, categoría, marca, unidad (`pieza`, `caja`, `kg`, `litro`, `metro`), precio de venta, stock mínimo, notas.  
+SKU único, categoría, marca, unidad (catálogo ampliado para ferretería), código de barras, imagen, precio de venta, precio/cantidad de mayoreo, stock mínimo, notas.  
 Campos cacheados: `stock`, `avg_cost` (costo promedio ponderado).
+
+### Documentos (`documents` / `document_lines`)
+
+Ventas (`sale`) y compras (`purchase`) con folio, partidas, totales y cancelación que revierte movimientos de stock. Los movimientos ligados llevan `document_id`.
 
 ### Movimientos (`stock_movements`)
 
@@ -103,9 +110,9 @@ Pruebas: `inventory-math.spec.ts` (Vitest).
 
 ## 8. Persistencia
 
-`migrations.ts`: `SCHEMA_VERSION = 2`. Si `user_version < 2`, se eliminan tablas legadas v1 (`products`, `movements`) y se crea el esquema de inventario.
+`migrations.ts`: `SCHEMA_VERSION = 3`. Migración incremental: v1 legado → v2 → v3 (productos sin CHECK de unidad, imágenes, barcode, mayoreo, documentos).
 
-Tablas: `suppliers`, `brands`, `categories`, `products`, `stock_movements` (ver DDL en el archivo).
+Tablas: `suppliers`, `brands`, `categories`, `products`, `stock_movements`, `documents`, `document_lines`.
 
 `PRAGMA foreign_keys = ON`. Sin cifrado.
 
@@ -119,10 +126,10 @@ Tablas: `suppliers`, `brands`, `categories`, `products`, `stock_movements` (ver 
 
 ## 10. Respaldo
 
-`AppBackup` v2 incluye: `suppliers`, `brands`, `categories`, `products`, `stockMovements`.  
-Importación en transacción (borra todo e inserta en orden de FK). Rechaza otro `schemaVersion`.
+`AppBackup` v3 incluye catálogos, productos, movimientos, documentos, partidas e imágenes (base64).  
+Importación en transacción (borra todo e inserta en orden de FK). Acepta respaldo v2 (campos nuevos en null).
 
-`InventoryDataService.clearAll()` vacía las cinco tablas.
+`InventoryDataService.clearAll()` vacía todas las tablas de inventario.
 
 ## 11. UI y tema
 

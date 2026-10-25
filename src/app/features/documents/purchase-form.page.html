@@ -1,0 +1,87 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/operaciones"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Nueva compra</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar placeholder="Buscar producto" (ionInput)="onSearch($event)"></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (results().length) {
+    <ion-list [inset]="true">
+      @for (p of results(); track p.id) {
+        <ion-item button (click)="addProduct(p)">
+          <ion-label>
+            <h2>{{ p.name }}</h2>
+            <p>{{ p.sku }}</p>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  }
+
+  <form [formGroup]="form">
+    <ion-list [inset]="true">
+      <ion-item>
+        <ion-input label="Fecha" labelPlacement="stacked" type="date" formControlName="date"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-select label="Proveedor" labelPlacement="stacked" formControlName="supplierId" interface="popover">
+          @for (s of suppliers(); track s.id) {
+            <ion-select-option [value]="s.id">{{ s.name }}</ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-input label="No. factura" labelPlacement="stacked" formControlName="invoiceNumber"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input label="Notas" labelPlacement="stacked" formControlName="notes"></ion-input>
+      </ion-item>
+    </ion-list>
+  </form>
+
+  <ion-list [inset]="true">
+    <ion-item lines="none">
+      <ion-label><h2>Partidas</h2></ion-label>
+    </ion-item>
+    @for (line of lines(); track line.productId) {
+      <ion-item>
+        <ion-label>
+          <h3>{{ line.name }}</h3>
+          <p>{{ line.sku }}</p>
+        </ion-label>
+        <div class="line-controls" slot="end">
+          <ion-input
+            type="number"
+            [value]="line.quantity"
+            (ionChange)="updateLine(line.productId, Number($any($event.detail.value)), line.unitCost)"
+          ></ion-input>
+          <ion-input
+            type="number"
+            [value]="line.unitCost"
+            (ionChange)="updateLine(line.productId, line.quantity, Number($any($event.detail.value)))"
+          ></ion-input>
+          <ion-note>{{ line.lineTotal | mxn }}</ion-note>
+          <ion-button fill="clear" color="danger" (click)="removeLine(line.productId)">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-item>
+    }
+    <ion-item lines="none">
+      <ion-label>Total</ion-label>
+      <ion-note slot="end">{{ total() | mxn }}</ion-note>
+    </ion-item>
+  </ion-list>
+
+  <div class="form-actions">
+    <ion-button expand="block" [disabled]="saving() || lines().length === 0" (click)="save()">
+      Registrar compra
+    </ion-button>
+  </div>
+</ion-content>

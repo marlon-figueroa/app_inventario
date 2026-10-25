@@ -23,6 +23,7 @@
       @for (item of items(); track item.id) {
         <ion-item-sliding>
           <ion-item [routerLink]="['/tabs/ajustes/marcas', item.id, 'editar']" detail="true">
+            <ion-icon name="pricetag-outline" slot="start" color="primary"></ion-icon>
             <ion-label>
               <h2>{{ item.name }}</h2>
               <p>{{ item.supplierName }}</p>

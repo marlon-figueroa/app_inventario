@@ -120,6 +120,16 @@ export class MovementFormPage implements OnInit {
     if (!movement) {
       return;
     }
+    if (movement.documentId) {
+      const toast = await this.toastCtrl.create({
+        message: 'Este movimiento pertenece a una venta o compra y no se puede editar aquí.',
+        duration: 2800,
+        color: 'dark',
+      });
+      await toast.present();
+      await this.router.navigate(['/tabs/operaciones']);
+      return;
+    }
     this.setType(movement.type);
     this.form.patchValue({
       productId: movement.productId,
@@ -203,7 +213,7 @@ export class MovementFormPage implements OnInit {
         color: 'success',
       });
       await toast.present();
-      await this.router.navigate(['/tabs/movimientos']);
+      await this.router.navigate(['/tabs/operaciones']);
     } catch (error) {
       const toast = await this.toastCtrl.create({
         message: error instanceof Error ? error.message : 'No se pudo guardar',

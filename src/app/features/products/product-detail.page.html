@@ -12,6 +12,13 @@
 
 <ion-content [fullscreen]="true">
   @if (product(); as p) {
+    <app-entity-image
+      kind="products"
+      [entityId]="p.id"
+      [imagePath]="p.imagePath"
+      [editable]="false"
+    />
+
     <ion-list [inset]="true">
       <ion-item>
         <ion-label>
@@ -49,13 +56,13 @@
     </ion-list>
 
     <div class="action-row">
-      <ion-button expand="block" [routerLink]="['/tabs/movimientos/nuevo']" [queryParams]="movementQuery('entry')">
+      <ion-button expand="block" [routerLink]="['/tabs/operaciones/movimientos/nuevo']" [queryParams]="movementQuery('entry')">
         Entrada
       </ion-button>
-      <ion-button expand="block" color="secondary" [routerLink]="['/tabs/movimientos/nuevo']" [queryParams]="movementQuery('exit')">
+      <ion-button expand="block" color="secondary" [routerLink]="['/tabs/operaciones/movimientos/nuevo']" [queryParams]="movementQuery('exit')">
         Salida
       </ion-button>
-      <ion-button expand="block" color="medium" [routerLink]="['/tabs/movimientos/nuevo']" [queryParams]="movementQuery('adjustment')">
+      <ion-button expand="block" color="medium" [routerLink]="['/tabs/operaciones/movimientos/nuevo']" [queryParams]="movementQuery('adjustment')">
         Ajuste
       </ion-button>
     </div>

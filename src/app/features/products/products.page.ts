@@ -2,10 +2,13 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {
   AlertController,
+  ToastController,
   IonBadge,
   IonContent,
+  IonCol,
   IonFab,
   IonFabButton,
+  IonGrid,
   IonHeader,
   IonIcon,
   IonItem,
@@ -17,6 +20,7 @@ import {
   IonNote,
   IonRefresher,
   IonRefresherContent,
+  IonRow,
   IonSearchbar,
   IonSelect,
   IonSelectOption,
@@ -42,6 +46,9 @@ import { ProductListFilters, ProductService } from './product.service';
     IonContent,
     IonRefresher,
     IonRefresherContent,
+    IonGrid,
+    IonRow,
+    IonCol,
     IonSearchbar,
     IonSelect,
     IonSelectOption,
@@ -67,6 +74,7 @@ export class ProductsPage {
   private brandsApi = inject(BrandService);
   private suppliersApi = inject(SupplierService);
   private alertCtrl = inject(AlertController);
+  private toastCtrl = inject(ToastController);
 
   products = signal<ProductStock[]>([]);
   search = signal('');
@@ -111,17 +119,46 @@ export class ProductsPage {
   }
 
   async confirmDelete(product: ProductStock): Promise<void> {
+    const movementCount = await this.productsApi.movementCount(product.id);
+    if (movementCount > 0) {
+      const alert = await this.alertCtrl.create({
+        header: 'Producto con historial',
+        message: `${product.name} tiene ${movementCount} movimiento(s). No se puede eliminar; puedes desactivarlo.`,
+        buttons: [
+          { text: 'Cancelar', role: 'cancel' },
+          {
+            text: 'Desactivar',
+            handler: async () => {
+              await this.productsApi.deactivate(product.id);
+              await this.reload();
+            },
+          },
+        ],
+      });
+      await alert.present();
+      return;
+    }
+
     const alert = await this.alertCtrl.create({
       header: 'Eliminar producto',
-      message: `Se borrará ${product.name} y todo su historial de movimientos.`,
+      message: `Se borrará ${product.name} (sin movimientos registrados).`,
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Eliminar',
           role: 'destructive',
           handler: async () => {
-            await this.productsApi.remove(product.id);
-            await this.reload();
+            try {
+              await this.productsApi.remove(product.id);
+              await this.reload();
+            } catch (error) {
+              const toast = await this.toastCtrl.create({
+                message: error instanceof Error ? error.message : 'No se pudo eliminar',
+                duration: 2400,
+                color: 'dark',
+              });
+              await toast.present();
+            }
           },
         },
       ],

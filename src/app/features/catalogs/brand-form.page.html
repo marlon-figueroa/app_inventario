@@ -9,6 +9,13 @@
 
 <ion-content [fullscreen]="true">
   <form [formGroup]="form" (ngSubmit)="save()">
+    <app-entity-image
+      kind="brands"
+      [entityId]="entityId()"
+      [imagePath]="imagePath()"
+      (imagePathChange)="onImagePathChange($event)"
+    />
+
     <ion-list [inset]="true">
       <ion-item>
         <ion-input label="Nombre" labelPlacement="stacked" formControlName="name" required></ion-input>

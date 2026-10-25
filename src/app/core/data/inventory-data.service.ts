@@ -7,7 +7,9 @@ export class InventoryDataService {
 
   async clearAll(): Promise<void> {
     await this.db.execute(`
+      DELETE FROM document_lines;
       DELETE FROM stock_movements;
+      DELETE FROM documents;
       DELETE FROM products;
       DELETE FROM brands;
       DELETE FROM categories;

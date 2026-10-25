@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {
   IonBadge,
+  IonButton,
   IonContent,
   IonHeader,
   IonIcon,
@@ -38,6 +39,7 @@ import { ProductService } from '../products/product.service';
     IonLabel,
     IonNote,
     IonBadge,
+  IonButton,
   IonSpinner,
     RouterLink,
     MxnPipe,

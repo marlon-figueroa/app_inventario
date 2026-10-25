@@ -20,6 +20,7 @@ interface MovementRow {
   unit_price: number | null;
   reason: string;
   reference: string | null;
+  document_id: string | null;
   date: string;
   notes: string | null;
   created_at: string;
@@ -117,13 +118,18 @@ export class StockMovementService {
     if (!previous) {
       return;
     }
+    if (previous.documentId) {
+      throw new Error(
+        'Este movimiento pertenece a una venta o compra. Cancélala desde Operaciones.'
+      );
+    }
     const quantity = this.normalizeQuantity(input);
     const conn = this.db.getConnection();
     await conn.beginTransaction();
     try {
       await conn.run(
         `UPDATE stock_movements SET
-          product_id=?, type=?, quantity=?, unit_cost=?, unit_price=?, reason=?, reference=?, date=?, notes=?
+          product_id=?, type=?, quantity=?, unit_cost=?, unit_price=?, reason=?, reference=?, document_id=?, date=?, notes=?
          WHERE id=?;`,
         [
           input.productId,
@@ -133,6 +139,7 @@ export class StockMovementService {
           input.type === 'exit' ? roundMoney(input.unitPrice ?? 0) : null,
           input.reason,
           input.reference?.trim() || null,
+          input.documentId ?? null,
           input.date,
           input.notes?.trim() || null,
           id,
@@ -158,6 +165,11 @@ export class StockMovementService {
     const previous = await this.get(id);
     if (!previous) {
       return;
+    }
+    if (previous.documentId) {
+      throw new Error(
+        'Este movimiento pertenece a una venta o compra. Cancélala desde Operaciones.'
+      );
     }
     await this.withRecalculate(previous.productId, async () => {
       await this.db.getConnection().run('DELETE FROM stock_movements WHERE id=?;', [id], false);
@@ -215,8 +227,8 @@ export class StockMovementService {
       : (sql: string, values: unknown[]) => conn.run(sql, values, false);
     await run(
       `INSERT INTO stock_movements (
-        id, product_id, type, quantity, unit_cost, unit_price, reason, reference, date, notes, created_at
-      ) VALUES (?,?,?,?,?,?,?,?,?,?,?);`,
+        id, product_id, type, quantity, unit_cost, unit_price, reason, reference, document_id, date, notes, created_at
+      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);`,
       [
         id,
         input.productId,
@@ -226,6 +238,7 @@ export class StockMovementService {
         input.type === 'exit' ? roundMoney(input.unitPrice ?? 0) : null,
         input.reason,
         input.reference?.trim() || null,
+        input.documentId ?? null,
         input.date,
         input.notes?.trim() || null,
         new Date().toISOString(),
@@ -254,6 +267,7 @@ export class StockMovementService {
       unitPrice: row.unit_price,
       reason: row.reason,
       reference: row.reference,
+      documentId: row.document_id,
       date: row.date,
       notes: row.notes,
       createdAt: row.created_at,

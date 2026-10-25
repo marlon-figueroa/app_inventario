@@ -1,8 +1,8 @@
 {
   "name": "Inventario",
   "short_name": "Inventario",
-  "description": "Inventario de deudas, tarjetas, préstamos y extrafinanciamientos.",
-  "theme_color": "#8f7320",
+  "description": "Gestor de inventario offline con entradas, salidas y reportes.",
+  "theme_color": "#1e40af",
   "background_color": "#ffffff",
   "display": "standalone",
   "orientation": "portrait",
@@ -11,7 +11,7 @@
   "lang": "es-MX",
   "icons": [
     {
-      "src": "assets/icon/favicon.png",
+      "src": "assets/icon/favicon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"

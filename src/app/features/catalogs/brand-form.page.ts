@@ -16,7 +16,10 @@ import {
   IonToolbar,
   ToastController,
 } from '@ionic/angular';
+import { createId } from '../../core/ids';
+import { ImageService } from '../../core/media/image.service';
 import { Supplier } from '../../core/models';
+import { EntityImageComponent } from '../../shared/entity-image.component';
 import { BrandService } from './brand.service';
 import { SupplierService } from './supplier.service';
 
@@ -26,6 +29,7 @@ import { SupplierService } from './supplier.service';
   styleUrls: ['./catalogs.page.scss'],
   imports: [
     ReactiveFormsModule,
+    EntityImageComponent,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -44,12 +48,15 @@ export class BrandFormPage implements OnInit {
   private fb = inject(FormBuilder);
   private api = inject(BrandService);
   private suppliersApi = inject(SupplierService);
+  private images = inject(ImageService);
   private router = inject(Router);
   private toastCtrl = inject(ToastController);
 
   id = input<string | undefined>();
   saving = signal(false);
   suppliers = signal<Supplier[]>([]);
+  imagePath = signal<string | null>(null);
+  entityId = signal('');
 
   form = this.fb.nonNullable.group({
     name: ['', Validators.required],
@@ -61,6 +68,7 @@ export class BrandFormPage implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    this.entityId.set(this.id() ?? createId());
     this.suppliers.set(await this.suppliersApi.list(true));
     const id = this.id();
     if (!id) {
@@ -70,7 +78,12 @@ export class BrandFormPage implements OnInit {
     if (!item) {
       return;
     }
+    this.imagePath.set(item.imagePath);
     this.form.patchValue({ name: item.name, supplierId: item.supplierId });
+  }
+
+  onImagePathChange(path: string | null): void {
+    this.imagePath.set(path);
   }
 
   async save(): Promise<void> {
@@ -80,11 +93,20 @@ export class BrandFormPage implements OnInit {
     }
     this.saving.set(true);
     const value = this.form.getRawValue();
+    const payload = {
+      name: value.name,
+      supplierId: value.supplierId,
+      imagePath: this.imagePath(),
+    };
     try {
       if (this.id()) {
-        await this.api.update(this.id()!, value);
+        const previous = await this.api.get(this.id()!);
+        await this.api.update(this.id()!, payload);
+        if (previous?.imagePath && previous.imagePath !== payload.imagePath) {
+          await this.images.remove(previous.imagePath);
+        }
       } else {
-        await this.api.create(value);
+        await this.api.create(payload, this.entityId());
       }
       const toast = await this.toastCtrl.create({
         message: 'Marca guardada',

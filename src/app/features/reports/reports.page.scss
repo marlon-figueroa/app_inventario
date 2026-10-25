@@ -33,11 +33,11 @@ ion-segment {
 }
 
 .danger {
-  color: var(--ion-color-gold);
+  color: var(--ion-color-danger);
 }
 
 .success {
-  color: var(--ion-color-info);
+  color: var(--ion-color-success);
 }
 
 .payments {
@@ -52,4 +52,11 @@ ion-segment {
 .empty {
   padding: 0 20px;
   color: var(--ion-color-medium);
+}
+
+.export-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0 1rem 1rem;
 }

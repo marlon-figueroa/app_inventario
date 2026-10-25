@@ -95,9 +95,10 @@ APK debug: `android/app/build/outputs/apk/debug/app_inventario.apk`
 
 1. En **Ajustes → Catálogos**, crea proveedores, marcas y categorías.
 2. Registra **productos** (SKU, categoría, marca).
-3. Usa **Entrada**, **Salida** o **Ajuste** desde el detalle del producto o la pestaña Movimientos.
-4. Revisa **Inicio** (valor de inventario, stock bajo) y **Reportes** por día/semana/mes/año.
-5. Exporta o restaura respaldo JSON en Ajustes.
+3. En **Operaciones**, registra **ventas** (ticket), **compras** o movimientos sueltos (entrada/salida/ajuste).
+4. Asigna **fotos** a productos y marcas; usa **código de barras** en Android o lector USB en web.
+5. Revisa **Inicio** y **Reportes** (incluye CSV de inventario, movimientos y ventas).
+6. Exporta o restaura respaldo JSON v3 en Ajustes.
 
 ## Scripts
 

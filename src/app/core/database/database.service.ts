@@ -6,7 +6,7 @@ import {
   SQLiteDBConnection,
 } from '@capacitor-community/sqlite';
 import { defineCustomElements as defineJeepSqlite } from 'jeep-sqlite/loader';
-import { DB_NAME, DROP_LEGACY_V1, SCHEMA_V2, SCHEMA_VERSION } from './migrations';
+import { DB_NAME, DROP_LEGACY_V1, MIGRATION_V3, SCHEMA_V2, SCHEMA_VERSION } from './migrations';
 
 @Injectable({ providedIn: 'root' })
 export class DatabaseService {
@@ -78,14 +78,23 @@ export class DatabaseService {
 
   private async migrate(): Promise<void> {
     const rows = await this.getConnection().query('PRAGMA user_version;');
-    const current = Number(rows.values?.[0]?.['user_version'] ?? 0);
+    let current = Number(rows.values?.[0]?.['user_version'] ?? 0);
     if (current >= SCHEMA_VERSION) {
       return;
     }
-    if (current > 0) {
-      await this.getConnection().execute(DROP_LEGACY_V1, false);
+
+    if (current < 2) {
+      if (current === 1) {
+        await this.getConnection().execute(DROP_LEGACY_V1, false);
+      }
+      await this.getConnection().execute(SCHEMA_V2, false);
+      current = 2;
+      await this.getConnection().execute('PRAGMA user_version = 2;', false);
     }
-    await this.getConnection().execute(SCHEMA_V2, false);
-    await this.getConnection().execute(`PRAGMA user_version = ${SCHEMA_VERSION};`, false);
+
+    if (current < 3) {
+      await this.getConnection().execute(MIGRATION_V3, false);
+      await this.getConnection().execute('PRAGMA user_version = 3;', false);
+    }
   }
 }

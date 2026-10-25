@@ -22,6 +22,7 @@ import {
   MovementTypeLabelPipe,
   ProductUnitLabelPipe,
 } from '../../shared/label.pipe';
+import { EntityImageComponent } from '../../shared/entity-image.component';
 import { MxnPipe } from '../../shared/mxn.pipe';
 import { StockMovementService } from '../movements/stock-movement.service';
 import { ProductService } from './product.service';
@@ -43,6 +44,7 @@ import { ProductService } from './product.service';
     IonNote,
     IonBadge,
     IonButton,
+    EntityImageComponent,
   RouterLink,
     MxnPipe,
     ProductUnitLabelPipe,

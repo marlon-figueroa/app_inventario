@@ -19,6 +19,56 @@
   </div>
 
   @if (report(); as current) {
+    <ion-list [inset]="true">
+      <ion-item lines="none">
+        <ion-label><h2>Ventas (tickets)</h2></ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label>Tickets completados</ion-label>
+        <ion-note slot="end">{{ current.sales.saleCount }}</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>Ingresos</ion-label>
+        <ion-note slot="end">{{ current.sales.totalRevenue | mxn }}</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>Ticket promedio</ion-label>
+        <ion-note slot="end">{{ current.sales.averageTicket | mxn }}</ion-note>
+      </ion-item>
+      @for (row of current.sales.byPaymentMethod; track row.method) {
+        <ion-item>
+          <ion-label>{{ paymentLabels[row.method] }}</ion-label>
+          <ion-note slot="end">{{ row.total | mxn }} ({{ row.count }})</ion-note>
+        </ion-item>
+      }
+    </ion-list>
+
+    <ion-list [inset]="true">
+      <ion-item lines="none">
+        <ion-label><h2>Compras</h2></ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label>Recepciones</ion-label>
+        <ion-note slot="end">{{ current.purchases.purchaseCount }}</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>Costo total</ion-label>
+        <ion-note slot="end">{{ current.purchases.totalCost | mxn }}</ion-note>
+      </ion-item>
+      @for (row of current.purchases.bySupplier; track row.supplierId) {
+        <ion-item>
+          <ion-label>{{ row.supplierName }}</ion-label>
+          <ion-note slot="end">{{ row.total | mxn }}</ion-note>
+        </ion-item>
+      }
+    </ion-list>
+
+    <div class="export-actions">
+      <ion-button fill="outline" size="small" (click)="exportInventory()">CSV inventario</ion-button>
+      <ion-button fill="outline" size="small" (click)="exportPeriodMovements()">CSV movimientos</ion-button>
+      <ion-button fill="outline" size="small" (click)="exportPeriodSales()">CSV ventas</ion-button>
+    </div>
+
     <div class="totals">
       <article>
         <span>Entradas (costo)</span>
@@ -69,7 +119,7 @@
     <h2 class="section-title">Movimientos del periodo</h2>
     <ion-list [inset]="true">
       @for (movement of current.movements; track movement.id) {
-        <ion-item [routerLink]="['/tabs/movimientos', movement.id, 'editar']" detail="true">
+        <ion-item detail="false">
           <ion-label>
             <h2>{{ movement.type | movementTypeLabel }}</h2>
             <p>{{ movement.productName }} · {{ movement.date | displayDate }}</p>

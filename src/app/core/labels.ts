@@ -1,8 +1,10 @@
 import {
   AdjustmentReason,
+  DocumentType,
   EntryReason,
   ExitReason,
   MovementType,
+  PaymentMethod,
   ProductUnit,
   ReportPeriod,
 } from './models';
@@ -13,12 +15,30 @@ export const PRODUCT_UNIT_LABELS: Record<ProductUnit, string> = {
   kg: 'Kilogramo',
   litro: 'Litro',
   metro: 'Metro',
+  rollo: 'Rollo',
+  par: 'Par',
+  juego: 'Juego',
+  bulto: 'Bulto',
+  galon: 'Galón',
+  saco: 'Saco',
+  bolsa: 'Bolsa',
 };
 
 export const MOVEMENT_TYPE_LABELS: Record<MovementType, string> = {
   entry: 'Entrada',
   exit: 'Salida',
   adjustment: 'Ajuste',
+};
+
+export const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
+  sale: 'Venta',
+  purchase: 'Compra',
+};
+
+export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
+  efectivo: 'Efectivo',
+  tarjeta: 'Tarjeta',
+  transferencia: 'Transferencia',
 };
 
 export const ENTRY_REASON_LABELS: Record<EntryReason, string> = {
@@ -57,4 +77,9 @@ export function reasonLabel(type: MovementType, reason: string): string {
     return EXIT_REASON_LABELS[reason as ExitReason] ?? reason;
   }
   return ADJUSTMENT_REASON_LABELS[reason as AdjustmentReason] ?? reason;
+}
+
+export function documentFolioLabel(type: DocumentType, folio: number): string {
+  const prefix = type === 'sale' ? 'V' : 'C';
+  return `${prefix}-${String(folio).padStart(6, '0')}`;
 }

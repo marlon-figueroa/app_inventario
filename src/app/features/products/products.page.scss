@@ -1,3 +1,42 @@
+.toolbar-search {
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 4px;
+  --min-height: auto;
+}
+
+.products-toolbar-grid {
+  width: 100%;
+  max-width: 100%;
+  padding-inline: 8px 8px;
+}
+
+.toolbar-search ion-searchbar.products-search {
+  --box-shadow: none;
+  padding-inline: 8px;
+}
+
+.filter-row ion-col {
+  padding-inline: 4px;
+  min-width: 0;
+}
+
+.filter-select {
+  width: 100%;
+  max-width: 100%;
+  font-size: 0.8125rem;
+  --padding-start: 4px;
+  --padding-end: 4px;
+}
+
+.filter-select::part(text),
+.filter-select::part(placeholder) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .empty {
   display: flex;
   flex-direction: column;

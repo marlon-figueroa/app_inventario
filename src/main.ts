@@ -1,6 +1,7 @@
 import { registerLocaleData } from '@angular/common';
 import { isDevMode, LOCALE_ID, provideAppInitializer, inject } from '@angular/core';
 import localeEsMx from '@angular/common/locales/es-MX';
+import { defineCustomElements } from '@ionic/pwa-elements/loader';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideServiceWorker } from '@angular/service-worker';
 import { PreloadAllModules, provideRouter, RouteReuseStrategy, withComponentInputBinding, withPreloading } from '@angular/router';
@@ -12,6 +13,7 @@ import { DatabaseService } from './app/core/database/database.service';
 import { ThemeService } from './app/core/theme/theme.service';
 
 registerLocaleData(localeEsMx);
+void defineCustomElements(window);
 
 const isNativeApp = Capacitor.isNativePlatform();
 

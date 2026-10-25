@@ -18,9 +18,7 @@ export class ThemeService {
 
   readonly preference = this.preferenceSignal.asReadonly();
   readonly resolved = computed<ResolvedTheme>(() => resolveTheme(this.preferenceSignal()));
-  readonly logoSrc = computed(() =>
-    this.resolved() === 'dark' ? 'assets/icon/logo-dark.png' : 'assets/icon/logo-light.png',
-  );
+  readonly logoSrc = computed(() => 'assets/icon/logo.png');
 
   constructor() {
     this.media?.addEventListener('change', () => {

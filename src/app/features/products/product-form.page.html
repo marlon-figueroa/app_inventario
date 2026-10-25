@@ -9,12 +9,22 @@
 
 <ion-content [fullscreen]="true">
   <form [formGroup]="form" (ngSubmit)="save()">
+    <app-entity-image
+      kind="products"
+      [entityId]="entityId()"
+      [imagePath]="imagePath()"
+      (imagePathChange)="onImagePathChange($event)"
+    />
+
     <ion-list [inset]="true">
       <ion-item>
         <ion-input label="SKU" labelPlacement="stacked" formControlName="sku" required></ion-input>
       </ion-item>
       <ion-item>
         <ion-input label="Nombre" labelPlacement="stacked" formControlName="name" required></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input label="Código de barras" labelPlacement="stacked" formControlName="barcode"></ion-input>
       </ion-item>
       <ion-item>
         <ion-select label="Categoría" labelPlacement="stacked" formControlName="categoryId" interface="popover">
@@ -45,6 +55,22 @@
       </ion-item>
       <ion-item>
         <ion-input label="Precio de venta" labelPlacement="stacked" type="number" formControlName="salePrice"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input
+          label="Precio mayoreo"
+          labelPlacement="stacked"
+          type="number"
+          formControlName="wholesalePrice"
+        ></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input
+          label="Cantidad mínima mayoreo"
+          labelPlacement="stacked"
+          type="number"
+          formControlName="wholesaleMinQty"
+        ></ion-input>
       </ion-item>
       <ion-item>
         <ion-input label="Stock mínimo" labelPlacement="stacked" type="number" formControlName="minStock"></ion-input>

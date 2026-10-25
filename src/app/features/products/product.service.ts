@@ -11,7 +11,11 @@ interface ProductRow {
   category_id: string;
   brand_id: string;
   unit: ProductUnit;
+  barcode: string | null;
+  image_path: string | null;
   sale_price: number;
+  wholesale_price: number;
+  wholesale_min_qty: number;
   min_stock: number;
   stock: number;
   avg_cost: number;
@@ -58,9 +62,9 @@ export class ProductService {
       values.push(filters.supplierId);
     }
     if (filters.search?.trim()) {
-      where.push('(p.name LIKE ? OR p.sku LIKE ?)');
+      where.push('(p.name LIKE ? OR p.sku LIKE ? OR p.barcode LIKE ?)');
       const q = `%${filters.search.trim()}%`;
-      values.push(q, q);
+      values.push(q, q, q);
     }
     if (filters.lowStockOnly) {
       where.push('p.stock <= p.min_stock');
@@ -104,14 +108,48 @@ export class ProductService {
     return rows[0] ? this.mapStock(rows[0]) : null;
   }
 
-  async create(input: ProductInput): Promise<string> {
-    const id = createId();
+  async findByCode(code: string): Promise<ProductStock | null> {
+    const trimmed = code.trim();
+    if (!trimmed) {
+      return null;
+    }
+    const upper = trimmed.toUpperCase();
+    const rows = await this.db.query<ProductRow>(
+      `
+      SELECT
+        p.*,
+        c.name AS category_name,
+        b.name AS brand_name,
+        b.supplier_id AS supplier_id,
+        s.name AS supplier_name
+      FROM products p
+      JOIN categories c ON c.id = p.category_id
+      JOIN brands b ON b.id = p.brand_id
+      JOIN suppliers s ON s.id = b.supplier_id
+      WHERE p.sku = ? OR p.barcode = ? OR p.barcode = ?
+      LIMIT 1;
+    `,
+      [upper, trimmed, upper]
+    );
+    return rows[0] ? this.mapStock(rows[0]) : null;
+  }
+
+  async movementCount(productId: string): Promise<number> {
+    const rows = await this.db.query<{ c: number }>(
+      'SELECT COUNT(*) AS c FROM stock_movements WHERE product_id=?;',
+      [productId]
+    );
+    return Number(rows[0]?.c ?? 0);
+  }
+
+  async create(input: ProductInput, id: string = createId()): Promise<string> {
     const now = new Date().toISOString();
     await this.db.run(
       `INSERT INTO products (
-        id, sku, name, category_id, brand_id, unit, sale_price, min_stock,
+        id, sku, name, category_id, brand_id, unit, barcode, image_path,
+        sale_price, wholesale_price, wholesale_min_qty, min_stock,
         stock, avg_cost, active, notes, created_at, updated_at
-      ) VALUES (?,?,?,?,?,?,?,?,0,0,?,?,?,?);`,
+      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,0,0,?,?,?,?);`,
       [
         id,
         input.sku.trim().toUpperCase(),
@@ -119,7 +157,11 @@ export class ProductService {
         input.categoryId,
         input.brandId,
         input.unit,
+        this.normalizeBarcode(input.barcode),
+        input.imagePath?.trim() || null,
         roundMoney(input.salePrice ?? 0),
+        roundMoney(input.wholesalePrice ?? 0),
+        roundQty(input.wholesaleMinQty ?? 0),
         roundQty(input.minStock ?? 0),
         input.active === false ? 0 : 1,
         input.notes?.trim() || null,
@@ -133,7 +175,8 @@ export class ProductService {
   async update(id: string, input: ProductInput): Promise<void> {
     await this.db.run(
       `UPDATE products SET
-        sku=?, name=?, category_id=?, brand_id=?, unit=?, sale_price=?, min_stock=?,
+        sku=?, name=?, category_id=?, brand_id=?, unit=?, barcode=?, image_path=?,
+        sale_price=?, wholesale_price=?, wholesale_min_qty=?, min_stock=?,
         active=?, notes=?, updated_at=?
        WHERE id=?;`,
       [
@@ -142,7 +185,11 @@ export class ProductService {
         input.categoryId,
         input.brandId,
         input.unit,
+        this.normalizeBarcode(input.barcode),
+        input.imagePath?.trim() || null,
         roundMoney(input.salePrice ?? 0),
+        roundMoney(input.wholesalePrice ?? 0),
+        roundQty(input.wholesaleMinQty ?? 0),
         roundQty(input.minStock ?? 0),
         input.active === false ? 0 : 1,
         input.notes?.trim() || null,
@@ -152,7 +199,28 @@ export class ProductService {
     );
   }
 
+  async setImagePath(id: string, imagePath: string | null): Promise<void> {
+    await this.db.run('UPDATE products SET image_path=?, updated_at=? WHERE id=?;', [
+      imagePath,
+      new Date().toISOString(),
+      id,
+    ]);
+  }
+
+  async deactivate(id: string): Promise<void> {
+    await this.db.run('UPDATE products SET active=0, updated_at=? WHERE id=?;', [
+      new Date().toISOString(),
+      id,
+    ]);
+  }
+
   async remove(id: string): Promise<void> {
+    const count = await this.movementCount(id);
+    if (count > 0) {
+      throw new Error(
+        'No se puede eliminar: el producto tiene movimientos. Desactívalo para ocultarlo del catálogo.'
+      );
+    }
     await this.db.run('DELETE FROM products WHERE id=?;', [id]);
   }
 
@@ -172,6 +240,11 @@ export class ProductService {
     };
   }
 
+  private normalizeBarcode(barcode: string | null | undefined): string | null {
+    const value = barcode?.trim();
+    return value ? value : null;
+  }
+
   private mapStock(row: ProductRow): ProductStock {
     const stock = roundQty(Number(row.stock ?? 0));
     const avgCost = roundMoney(Number(row.avg_cost ?? 0));
@@ -183,7 +256,11 @@ export class ProductService {
       categoryId: row.category_id,
       brandId: row.brand_id,
       unit: row.unit,
+      barcode: row.barcode,
+      imagePath: row.image_path,
       salePrice: roundMoney(Number(row.sale_price ?? 0)),
+      wholesalePrice: roundMoney(Number(row.wholesale_price ?? 0)),
+      wholesaleMinQty: roundQty(Number(row.wholesale_min_qty ?? 0)),
       minStock,
       stock,
       avgCost,

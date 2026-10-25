@@ -2,43 +2,65 @@
   <ion-toolbar>
     <ion-title>Productos</ion-title>
   </ion-toolbar>
-  <ion-toolbar>
-    <ion-searchbar placeholder="Buscar por nombre o SKU" (ionInput)="onSearch($event)"></ion-searchbar>
-  </ion-toolbar>
-  <ion-toolbar>
-    <ion-select
-      placeholder="Categoría"
-      interface="popover"
-      [value]="categoryId()"
-      (ionChange)="categoryId.set($event.detail.value ?? ''); reload()"
-    >
-      <ion-select-option value="">Todas</ion-select-option>
-      @for (c of categories(); track c.id) {
-        <ion-select-option [value]="c.id">{{ c.name }}</ion-select-option>
-      }
-    </ion-select>
-    <ion-select
-      placeholder="Marca"
-      interface="popover"
-      [value]="brandId()"
-      (ionChange)="brandId.set($event.detail.value ?? ''); reload()"
-    >
-      <ion-select-option value="">Todas</ion-select-option>
-      @for (b of brands(); track b.id) {
-        <ion-select-option [value]="b.id">{{ b.name }}</ion-select-option>
-      }
-    </ion-select>
-    <ion-select
-      placeholder="Proveedor"
-      interface="popover"
-      [value]="supplierId()"
-      (ionChange)="supplierId.set($event.detail.value ?? ''); reload()"
-    >
-      <ion-select-option value="">Todos</ion-select-option>
-      @for (s of suppliers(); track s.id) {
-        <ion-select-option [value]="s.id">{{ s.name }}</ion-select-option>
-      }
-    </ion-select>
+  <ion-toolbar class="toolbar-search">
+    <ion-grid class="products-toolbar-grid">
+      <ion-row>
+        <ion-col size="12">
+          <ion-searchbar
+            class="products-search"
+            placeholder="Buscar por nombre o SKU"
+            (ionInput)="onSearch($event)"
+          ></ion-searchbar>
+        </ion-col>
+      </ion-row>
+      <ion-row class="filter-row">
+        <ion-col size="4">
+          <ion-select
+            class="filter-select"
+            aria-label="Categoría"
+            placeholder="Categoría"
+            interface="popover"
+            [value]="categoryId()"
+            (ionChange)="categoryId.set($event.detail.value ?? ''); reload()"
+          >
+            <ion-select-option value="">Todas</ion-select-option>
+            @for (c of categories(); track c.id) {
+              <ion-select-option [value]="c.id">{{ c.name }}</ion-select-option>
+            }
+          </ion-select>
+        </ion-col>
+        <ion-col size="4">
+          <ion-select
+            class="filter-select"
+            aria-label="Marca"
+            placeholder="Marca"
+            interface="popover"
+            [value]="brandId()"
+            (ionChange)="brandId.set($event.detail.value ?? ''); reload()"
+          >
+            <ion-select-option value="">Todas</ion-select-option>
+            @for (b of brands(); track b.id) {
+              <ion-select-option [value]="b.id">{{ b.name }}</ion-select-option>
+            }
+          </ion-select>
+        </ion-col>
+        <ion-col size="4">
+          <ion-select
+            class="filter-select"
+            aria-label="Proveedor"
+            placeholder="Proveedor"
+            interface="popover"
+            [value]="supplierId()"
+            (ionChange)="supplierId.set($event.detail.value ?? ''); reload()"
+          >
+            <ion-select-option value="">Todos</ion-select-option>
+            @for (s of suppliers(); track s.id) {
+              <ion-select-option [value]="s.id">{{ s.name }}</ion-select-option>
+            }
+          </ion-select>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
   </ion-toolbar>
 </ion-header>
 

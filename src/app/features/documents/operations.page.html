@@ -1,0 +1,87 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Operaciones</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [value]="segment()" (ionChange)="setSegment($any($event.detail.value))">
+      <ion-segment-button value="sales">Ventas</ion-segment-button>
+      <ion-segment-button value="purchases">Compras</ion-segment-button>
+      <ion-segment-button value="movements">Movimientos</ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+@if (segment() !== 'movements') {
+  <ion-content [fullscreen]="true">
+    <ion-refresher slot="fixed" (ionRefresh)="reload($event)">
+      <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
+
+    @if (segment() === 'sales') {
+      @if (sales().length === 0) {
+        <div class="empty">
+          <ion-icon name="receipt-outline"></ion-icon>
+          <h2>Sin ventas</h2>
+          <p>Registra una venta de mostrador con varias partidas.</p>
+        </div>
+      } @else {
+        <ion-list [inset]="true">
+          @for (doc of sales(); track doc.id) {
+            <ion-item [routerLink]="['/tabs/operaciones/documento', doc.id]" detail="true">
+              <ion-label>
+                <h2>{{ folioLabel(doc) }}</h2>
+                <p>{{ doc.date | displayDate }}</p>
+                @if (doc.customerName) {
+                  <p>{{ doc.customerName }}</p>
+                }
+              </ion-label>
+              <div class="end-meta" slot="end">
+                @if (doc.status === 'cancelled') {
+                  <ion-badge color="medium">Cancelada</ion-badge>
+                }
+                <ion-note>{{ doc.total | mxn }}</ion-note>
+              </div>
+            </ion-item>
+          }
+        </ion-list>
+      }
+    }
+
+    @if (segment() === 'purchases') {
+      @if (purchases().length === 0) {
+        <div class="empty">
+          <ion-icon name="cart-outline"></ion-icon>
+          <h2>Sin compras</h2>
+          <p>Registra recepción de mercancía por factura.</p>
+        </div>
+      } @else {
+        <ion-list [inset]="true">
+          @for (doc of purchases(); track doc.id) {
+            <ion-item [routerLink]="['/tabs/operaciones/documento', doc.id]" detail="true">
+              <ion-label>
+                <h2>{{ folioLabel(doc) }}</h2>
+                <p>{{ doc.date | displayDate }}</p>
+              </ion-label>
+              <div class="end-meta" slot="end">
+                @if (doc.status === 'cancelled') {
+                  <ion-badge color="medium">Cancelada</ion-badge>
+                }
+                <ion-note>{{ doc.total | mxn }}</ion-note>
+              </div>
+            </ion-item>
+          }
+        </ion-list>
+      }
+    }
+
+    @if (showFab()) {
+      <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+        <ion-fab-button [routerLink]="fabLink()">
+          <ion-icon name="add"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+    }
+  </ion-content>
+} @else {
+  <app-movements [embedded]="true"></app-movements>
+}

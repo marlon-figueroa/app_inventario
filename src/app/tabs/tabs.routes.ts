@@ -32,14 +32,44 @@ export const routes: Routes = [
           import('../features/products/product-form.page').then((m) => m.ProductFormPage),
       },
       {
-        path: 'movimientos',
+        path: 'operaciones',
         loadComponent: () =>
-          import('../features/movements/movements.page').then((m) => m.MovementsPage),
+          import('../features/documents/operations.page').then((m) => m.OperationsPage),
+      },
+      {
+        path: 'operaciones/venta/nueva',
+        loadComponent: () =>
+          import('../features/documents/sale-pos.page').then((m) => m.SalePosPage),
+      },
+      {
+        path: 'operaciones/compra/nueva',
+        loadComponent: () =>
+          import('../features/documents/purchase-form.page').then((m) => m.PurchaseFormPage),
+      },
+      {
+        path: 'operaciones/documento/:id',
+        loadComponent: () =>
+          import('../features/documents/document-detail.page').then((m) => m.DocumentDetailPage),
+      },
+      {
+        path: 'operaciones/movimientos/nuevo',
+        loadComponent: () =>
+          import('../features/movements/movement-form.page').then((m) => m.MovementFormPage),
+      },
+      {
+        path: 'operaciones/movimientos/:id/editar',
+        loadComponent: () =>
+          import('../features/movements/movement-form.page').then((m) => m.MovementFormPage),
+      },
+      {
+        path: 'movimientos',
+        redirectTo: 'operaciones',
+        pathMatch: 'full',
       },
       {
         path: 'movimientos/nuevo',
-        loadComponent: () =>
-          import('../features/movements/movement-form.page').then((m) => m.MovementFormPage),
+        redirectTo: 'operaciones/movimientos/nuevo',
+        pathMatch: 'full',
       },
       {
         path: 'movimientos/:id/editar',

@@ -1,0 +1,89 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/operaciones"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ folioLabel() }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (doc(); as d) {
+    <ion-list [inset]="true">
+      <ion-item>
+        <ion-label>Tipo</ion-label>
+        <ion-note slot="end">{{ typeLabels[d.type] }}</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>Fecha</ion-label>
+        <ion-note slot="end">{{ d.date | displayDate }}</ion-note>
+      </ion-item>
+      @if (d.customerName) {
+        <ion-item>
+          <ion-label>Cliente</ion-label>
+          <ion-note slot="end">{{ d.customerName }}</ion-note>
+        </ion-item>
+      }
+      @if (d.supplierName) {
+        <ion-item>
+          <ion-label>Proveedor</ion-label>
+          <ion-note slot="end">{{ d.supplierName }}</ion-note>
+        </ion-item>
+      }
+      @if (d.invoiceNumber) {
+        <ion-item>
+          <ion-label>Factura</ion-label>
+          <ion-note slot="end">{{ d.invoiceNumber }}</ion-note>
+        </ion-item>
+      }
+      @if (d.paymentMethod) {
+        <ion-item>
+          <ion-label>Pago</ion-label>
+          <ion-note slot="end">{{ paymentLabels[d.paymentMethod] }}</ion-note>
+        </ion-item>
+      }
+      <ion-item>
+        <ion-label>Estado</ion-label>
+        <ion-note slot="end">{{ d.status === 'cancelled' ? 'Cancelado' : 'Completado' }}</ion-note>
+      </ion-item>
+    </ion-list>
+
+    <ion-list [inset]="true">
+      @for (line of d.lines; track line.id) {
+        <ion-item>
+          <ion-label>
+            <h3>{{ line.productName }}</h3>
+            <p>{{ line.productSku }} · {{ line.quantity }} {{ line.productUnit | productUnitLabel }}</p>
+          </ion-label>
+          <ion-note slot="end">{{ line.lineTotal | mxn }}</ion-note>
+        </ion-item>
+      }
+      <ion-item>
+        <ion-label>Subtotal</ion-label>
+        <ion-note slot="end">{{ d.subtotal | mxn }}</ion-note>
+      </ion-item>
+      @if (d.discount) {
+        <ion-item>
+          <ion-label>Descuento</ion-label>
+          <ion-note slot="end">{{ d.discount | mxn }}</ion-note>
+        </ion-item>
+      }
+      <ion-item>
+        <ion-label><strong>Total</strong></ion-label>
+        <ion-note slot="end"><strong>{{ d.total | mxn }}</strong></ion-note>
+      </ion-item>
+    </ion-list>
+
+    <div class="form-actions">
+      <ion-button expand="block" fill="outline" (click)="shareTicket()">Compartir ticket</ion-button>
+      @if (d.type === 'sale') {
+        <ion-button expand="block" fill="clear" (click)="printTicket()">Imprimir</ion-button>
+      }
+      @if (d.status === 'completed') {
+        <ion-button expand="block" color="danger" fill="clear" (click)="cancelDocument()">
+          Cancelar documento
+        </ion-button>
+      }
+    </div>
+  }
+</ion-content>

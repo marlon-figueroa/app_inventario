@@ -4,18 +4,20 @@ import { addIcons } from 'ionicons';
 import {
   add,
   barChartOutline,
-  cardOutline,
+  businessOutline,
   cloudUploadOutline,
+  cubeOutline,
   downloadOutline,
+  folderOutline,
   homeOutline,
   moonOutline,
   personCircleOutline,
   phonePortraitOutline,
+  pricetagOutline,
   settingsOutline,
   sunnyOutline,
   swapVerticalOutline,
   trashOutline,
-  walletOutline,
 } from 'ionicons/icons';
 
 @Component({
@@ -28,18 +30,20 @@ export class AppComponent {
     addIcons({
       add,
       barChartOutline,
-      cardOutline,
+      businessOutline,
       cloudUploadOutline,
+      cubeOutline,
       downloadOutline,
+      folderOutline,
       homeOutline,
       moonOutline,
       personCircleOutline,
       phonePortraitOutline,
+      pricetagOutline,
       settingsOutline,
       sunnyOutline,
       swapVerticalOutline,
       trashOutline,
-      walletOutline,
     });
   }
 }

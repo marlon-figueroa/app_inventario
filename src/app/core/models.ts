@@ -1,4 +1,17 @@
-export const PRODUCT_UNITS = ['pieza', 'caja', 'kg', 'litro', 'metro'] as const;
+export const PRODUCT_UNITS = [
+  'pieza',
+  'caja',
+  'kg',
+  'litro',
+  'metro',
+  'rollo',
+  'par',
+  'juego',
+  'bulto',
+  'galon',
+  'saco',
+  'bolsa',
+] as const;
 export type ProductUnit = (typeof PRODUCT_UNITS)[number];
 
 export const MOVEMENT_TYPES = ['entry', 'exit', 'adjustment'] as const;
@@ -12,6 +25,15 @@ export type EntryReason = (typeof ENTRY_REASONS)[number];
 export type ExitReason = (typeof EXIT_REASONS)[number];
 export type AdjustmentReason = (typeof ADJUSTMENT_REASONS)[number];
 export type MovementReason = EntryReason | ExitReason | AdjustmentReason;
+
+export const DOCUMENT_TYPES = ['sale', 'purchase'] as const;
+export type DocumentType = (typeof DOCUMENT_TYPES)[number];
+
+export const DOCUMENT_STATUSES = ['completed', 'cancelled'] as const;
+export type DocumentStatus = (typeof DOCUMENT_STATUSES)[number];
+
+export const PAYMENT_METHODS = ['efectivo', 'tarjeta', 'transferencia'] as const;
+export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 
 export interface Supplier {
   id: string;
@@ -38,6 +60,7 @@ export interface Brand {
   id: string;
   name: string;
   supplierId: string;
+  imagePath: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -49,6 +72,7 @@ export interface BrandWithSupplier extends Brand {
 export interface BrandInput {
   name: string;
   supplierId: string;
+  imagePath?: string | null;
 }
 
 export interface Category {
@@ -71,7 +95,11 @@ export interface Product {
   categoryId: string;
   brandId: string;
   unit: ProductUnit;
+  barcode: string | null;
+  imagePath: string | null;
   salePrice: number;
+  wholesalePrice: number;
+  wholesaleMinQty: number;
   minStock: number;
   stock: number;
   avgCost: number;
@@ -87,7 +115,11 @@ export interface ProductInput {
   categoryId: string;
   brandId: string;
   unit: ProductUnit;
+  barcode?: string | null;
+  imagePath?: string | null;
   salePrice?: number;
+  wholesalePrice?: number;
+  wholesaleMinQty?: number;
   minStock?: number;
   notes?: string | null;
   active?: boolean;
@@ -111,6 +143,7 @@ export interface StockMovement {
   unitPrice: number | null;
   reason: string;
   reference: string | null;
+  documentId: string | null;
   date: string;
   notes: string | null;
   createdAt: string;
@@ -124,6 +157,7 @@ export interface StockMovementInput {
   unitPrice?: number | null;
   reason: string;
   reference?: string | null;
+  documentId?: string | null;
   date: string;
   notes?: string | null;
 }
@@ -135,6 +169,70 @@ export interface AdjustmentInput {
   date: string;
   reference?: string | null;
   notes?: string | null;
+}
+
+export interface InventoryDocument {
+  id: string;
+  type: DocumentType;
+  folio: number;
+  date: string;
+  supplierId: string | null;
+  customerName: string | null;
+  invoiceNumber: string | null;
+  paymentMethod: PaymentMethod | null;
+  subtotal: number;
+  discount: number;
+  total: number;
+  status: DocumentStatus;
+  cancelledAt: string | null;
+  cancelReason: string | null;
+  notes: string | null;
+  createdAt: string;
+}
+
+export interface DocumentLine {
+  id: string;
+  documentId: string;
+  productId: string;
+  quantity: number;
+  unitAmount: number;
+  lineTotal: number;
+  movementId: string | null;
+}
+
+export interface DocumentLineInput {
+  productId: string;
+  quantity: number;
+  unitAmount: number;
+}
+
+export interface SaleInput {
+  date: string;
+  customerName?: string | null;
+  paymentMethod: PaymentMethod;
+  discount?: number;
+  amountReceived?: number | null;
+  notes?: string | null;
+  lines: DocumentLineInput[];
+}
+
+export interface PurchaseInput {
+  date: string;
+  supplierId: string;
+  invoiceNumber?: string | null;
+  notes?: string | null;
+  lines: DocumentLineInput[];
+}
+
+export interface DocumentWithLines extends InventoryDocument {
+  lines: Array<
+    DocumentLine & {
+      productName: string;
+      productSku: string;
+      productUnit: ProductUnit;
+    }
+  >;
+  supplierName?: string;
 }
 
 export type ReportPeriod = 'day' | 'week' | 'month' | 'year';
@@ -154,6 +252,21 @@ export interface ReportByGroup extends ReportTotals {
   groupName: string;
 }
 
+export interface SalesReportSummary {
+  saleCount: number;
+  cancelledCount: number;
+  totalRevenue: number;
+  averageTicket: number;
+  byPaymentMethod: Array<{ method: PaymentMethod; count: number; total: number }>;
+}
+
+export interface PurchaseReportSummary {
+  purchaseCount: number;
+  cancelledCount: number;
+  totalCost: number;
+  bySupplier: Array<{ supplierId: string; supplierName: string; count: number; total: number }>;
+}
+
 export interface ReportResult {
   period: ReportPeriod;
   from: string;
@@ -162,10 +275,12 @@ export interface ReportResult {
   byCategory: ReportByGroup[];
   byBrand: ReportByGroup[];
   bySupplier: ReportByGroup[];
+  sales: SalesReportSummary;
+  purchases: PurchaseReportSummary;
   movements: Array<StockMovement & { productName: string; productSku: string }>;
 }
 
-export const BACKUP_SCHEMA_VERSION = 2;
+export const BACKUP_SCHEMA_VERSION = 3;
 
 export interface AppBackup {
   schemaVersion: number;
@@ -175,4 +290,8 @@ export interface AppBackup {
   categories: Category[];
   products: Product[];
   stockMovements: StockMovement[];
+  documents: InventoryDocument[];
+  documentLines: DocumentLine[];
+  /** Rutas relativas en Filesystem → base64 JPEG/PNG */
+  images?: Record<string, string>;
 }

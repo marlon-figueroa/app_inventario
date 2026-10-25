@@ -3,7 +3,8 @@
   height: 48px;
   margin-inline-end: 16px;
   border-radius: 12px;
-  object-fit: cover;
+  object-fit: contain;
+  background: #000;
 }
 
 .app-about {

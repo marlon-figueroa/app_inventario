@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {
   AlertController,
@@ -61,6 +61,8 @@ import { StockMovementService } from './stock-movement.service';
   ],
 })
 export class MovementsPage {
+  embedded = input(false);
+
   private movementsApi = inject(StockMovementService);
   private productsApi = inject(ProductService);
   private alertCtrl = inject(AlertController);
@@ -105,7 +107,20 @@ export class MovementsPage {
     return 'medium';
   }
 
+  isLinkedToDocument(item: StockMovement): boolean {
+    return !!item.documentId;
+  }
+
   async confirmDelete(item: StockMovement): Promise<void> {
+    if (this.isLinkedToDocument(item)) {
+      const toast = await this.toastCtrl.create({
+        message: 'Cancela la venta o compra desde Operaciones.',
+        duration: 2400,
+        color: 'dark',
+      });
+      await toast.present();
+      return;
+    }
     const alert = await this.alertCtrl.create({
       header: 'Eliminar movimiento',
       message: 'Se recalculará el stock del producto.',

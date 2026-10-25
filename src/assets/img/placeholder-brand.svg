@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <rect width="120" height="120" rx="12" fill="#E8E8ED"/>
+  <path d="M60 28l28 14v28L60 84 32 70V42L60 28z" stroke="#B8B8C2" stroke-width="4" fill="#D4D4DC"/>
+  <text x="60" y="66" text-anchor="middle" font-family="system-ui,sans-serif" font-size="14" fill="#888">Marca</text>
+</svg>
