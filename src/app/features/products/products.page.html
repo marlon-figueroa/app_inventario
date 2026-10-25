@@ -13,6 +13,18 @@
           ></ion-searchbar>
         </ion-col>
       </ion-row>
+      <ion-row class="chip-row">
+        <ion-col size="12">
+          <ion-chip
+            [color]="lowStockOnly() ? 'warning' : 'medium'"
+            [outline]="!lowStockOnly()"
+            (click)="toggleLowStock()"
+          >
+            <ion-icon name="warning-outline"></ion-icon>
+            <ion-label>Solo stock bajo</ion-label>
+          </ion-chip>
+        </ion-col>
+      </ion-row>
       <ion-row class="filter-row">
         <ion-col size="4">
           <ion-select
@@ -80,10 +92,11 @@
       @for (product of products(); track product.id) {
         <ion-item-sliding>
           <ion-item [routerLink]="['/tabs/productos', product.id]" detail="true">
+            <app-product-thumb [imagePath]="product.imagePath" />
             <ion-label>
               <h2>{{ product.name }}</h2>
-              <p>{{ product.sku }} · {{ product.categoryName }} · {{ product.brandName }}</p>
-              <p>{{ product.supplierName }}</p>
+              <p>{{ product.sku }} · {{ product.categoryName }}</p>
+              <p>{{ product.brandName }} · {{ product.supplierName }}</p>
             </ion-label>
             <div class="end-meta" slot="end">
               @if (product.lowStock) {

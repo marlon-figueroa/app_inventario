@@ -39,8 +39,10 @@ import { ImageEntityKind, ImageService } from '../core/media/image.service';
         width: 120px;
         height: 120px;
         object-fit: cover;
-        border-radius: 12px;
+        border-radius: 14px;
         background: var(--ion-color-light);
+        box-shadow: var(--app-shadow);
+        border: 1px solid var(--ion-border-color);
       }
     `,
   ],

@@ -17,6 +17,15 @@
   padding-inline: 8px;
 }
 
+.chip-row {
+  padding-inline: 8px 4px;
+}
+
+.chip-row ion-chip {
+  margin: 0 0 4px;
+  font-weight: 600;
+}
+
 .filter-row ion-col {
   padding-inline: 4px;
   min-width: 0;

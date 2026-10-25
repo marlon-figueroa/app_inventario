@@ -4,6 +4,7 @@ import {
   AlertController,
   ToastController,
   IonBadge,
+  IonChip,
   IonContent,
   IonCol,
   IonFab,
@@ -28,6 +29,7 @@ import {
   IonToolbar,
 } from '@ionic/angular';
 import { ProductStock } from '../../core/models';
+import { ProductThumbComponent } from '../../shared/product-thumb.component';
 import { ProductUnitLabelPipe } from '../../shared/label.pipe';
 import { MxnPipe } from '../../shared/mxn.pipe';
 import { BrandService } from '../catalogs/brand.service';
@@ -60,12 +62,14 @@ import { ProductListFilters, ProductService } from './product.service';
     IonLabel,
     IonNote,
     IonBadge,
+    IonChip,
     IonIcon,
     IonFab,
     IonFabButton,
     RouterLink,
     MxnPipe,
     ProductUnitLabelPipe,
+    ProductThumbComponent,
   ],
 })
 export class ProductsPage {
@@ -115,6 +119,11 @@ export class ProductsPage {
 
   onSearch(event: CustomEvent): void {
     this.search.set(String(event.detail.value ?? ''));
+    void this.reload();
+  }
+
+  toggleLowStock(): void {
+    this.lowStockOnly.update((v) => !v);
     void this.reload();
   }
 

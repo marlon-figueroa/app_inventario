@@ -2,7 +2,9 @@
   color-scheme: light;
   --app-chrome: #ffffff;
   --app-surface: #ffffff;
-  --app-page: #ffffff;
+  --app-page: #f1f5f9;
+  --app-radius: 14px;
+  --app-shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.04);
   /* Marca: azul intenso (antes dorado) */
   --app-gold: #1e40af;
   --app-gold-deep: #1e3a8a;
@@ -132,7 +134,8 @@ html.ion-palette-dark.md {
   color-scheme: dark;
   --app-chrome: #000000;
   --app-surface: #1a1a1a;
-  --app-page: #000000;
+  --app-page: #0a0a0a;
+  --app-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
   --app-gold: #3b82f6;
   --app-gold-deep: #1e40af;
 

@@ -2,7 +2,6 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {
   IonBadge,
-  IonButton,
   IonContent,
   IonHeader,
   IonIcon,
@@ -19,6 +18,7 @@ import {
 import { periodRange, todayIso } from '../../core/dates';
 import { ProductStock } from '../../core/models';
 import { DisplayDatePipe, MovementReasonLabelPipe, MovementTypeLabelPipe } from '../../shared/label.pipe';
+import { ProductThumbComponent } from '../../shared/product-thumb.component';
 import { MxnPipe } from '../../shared/mxn.pipe';
 import { StockMovementService } from '../movements/stock-movement.service';
 import { ProductService } from '../products/product.service';
@@ -39,13 +39,14 @@ import { ProductService } from '../products/product.service';
     IonLabel,
     IonNote,
     IonBadge,
-  IonButton,
-  IonSpinner,
+    IonIcon,
+    IonSpinner,
     RouterLink,
     MxnPipe,
     DisplayDatePipe,
     MovementTypeLabelPipe,
     MovementReasonLabelPipe,
+    ProductThumbComponent,
   ],
 })
 export class DashboardPage {
@@ -61,6 +62,16 @@ export class DashboardPage {
   >([]);
 
   hasLowStock = computed(() => this.lowStock().length > 0);
+
+  movementColor(type: string): string {
+    if (type === 'entry') {
+      return 'success';
+    }
+    if (type === 'exit') {
+      return 'warning';
+    }
+    return 'medium';
+  }
 
   async ionViewWillEnter(): Promise<void> {
     await this.reload();

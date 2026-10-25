@@ -5,14 +5,14 @@
     </ion-buttons>
     <ion-title>Nueva venta</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="scanBarcode()">
+      <ion-button (click)="scanBarcode()" aria-label="Escanear código">
         <ion-icon slot="icon-only" name="barcode-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
   <ion-toolbar>
     <ion-searchbar
-      placeholder="Buscar o escanear código + Enter"
+      placeholder="Nombre, SKU o código + Enter"
       [value]="search()"
       (ionInput)="onSearch($event)"
       (keydown)="onSearchKeydown($event)"
@@ -20,11 +20,13 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="pos-content">
   @if (results().length) {
+    <p class="page-section-title">Resultados</p>
     <ion-list [inset]="true">
       @for (p of results(); track p.id) {
         <ion-item button (click)="addProduct(p)">
+          <app-product-thumb [imagePath]="p.imagePath" />
           <ion-label>
             <h2>{{ p.name }}</h2>
             <p>{{ p.sku }} · Stock {{ p.stock }}</p>
@@ -35,34 +37,41 @@
     </ion-list>
   }
 
+  <p class="page-section-title">Carrito ({{ cart().length }})</p>
   <ion-list [inset]="true">
-    <ion-item lines="none">
-      <ion-label><h2>Carrito</h2></ion-label>
-    </ion-item>
     @if (cart().length === 0) {
-      <ion-item>
-        <ion-label>Agrega productos desde la búsqueda.</ion-label>
+      <ion-item lines="none" class="empty-cart">
+        <ion-label>
+          <h3>Carrito vacío</h3>
+          <p>Busca un producto o escanea un código de barras.</p>
+        </ion-label>
       </ion-item>
     } @else {
       @for (line of cart(); track line.productId) {
-        <ion-item>
+        <ion-item class="cart-line">
           <ion-label>
             <h3>{{ line.name }}</h3>
             <p>{{ line.sku }}</p>
+            <div class="qty-price">
+              <ion-input
+                label="Cant."
+                labelPlacement="stacked"
+                type="number"
+                [value]="line.quantity"
+                (ionChange)="updateLine(line.productId, Number($any($event.detail.value)), line.unitPrice)"
+              ></ion-input>
+              <ion-input
+                label="Precio"
+                labelPlacement="stacked"
+                type="number"
+                [value]="line.unitPrice"
+                (ionChange)="updateLine(line.productId, line.quantity, Number($any($event.detail.value)))"
+              ></ion-input>
+            </div>
           </ion-label>
-          <div class="line-controls" slot="end">
-            <ion-input
-              type="number"
-              [value]="line.quantity"
-              (ionChange)="updateLine(line.productId, Number($any($event.detail.value)), line.unitPrice)"
-            ></ion-input>
-            <ion-input
-              type="number"
-              [value]="line.unitPrice"
-              (ionChange)="updateLine(line.productId, line.quantity, Number($any($event.detail.value)))"
-            ></ion-input>
+          <div class="line-end" slot="end">
             <ion-note>{{ line.lineTotal | mxn }}</ion-note>
-            <ion-button fill="clear" color="danger" (click)="removeLine(line.productId)">
+            <ion-button fill="clear" color="danger" size="small" (click)="removeLine(line.productId)">
               <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
             </ion-button>
           </div>
@@ -72,6 +81,7 @@
   </ion-list>
 
   <form [formGroup]="form">
+    <p class="page-section-title">Pago</p>
     <ion-list [inset]="true">
       <ion-item>
         <ion-input label="Fecha" labelPlacement="stacked" type="date" formControlName="date"></ion-input>
@@ -106,20 +116,24 @@
       <ion-item>
         <ion-input label="Notas" labelPlacement="stacked" formControlName="notes"></ion-input>
       </ion-item>
-      <ion-item lines="none">
-        <ion-label>Subtotal</ion-label>
-        <ion-note slot="end">{{ subtotal() | mxn }}</ion-note>
-      </ion-item>
-      <ion-item lines="none">
-        <ion-label><strong>Total</strong></ion-label>
-        <ion-note slot="end"><strong>{{ total() | mxn }}</strong></ion-note>
-      </ion-item>
     </ion-list>
   </form>
+</ion-content>
 
-  <div class="form-actions">
+<ion-footer class="pos-footer">
+  <ion-toolbar>
+    <div class="footer-totals">
+      <div>
+        <span>Subtotal</span>
+        <strong>{{ subtotal() | mxn }}</strong>
+      </div>
+      <div class="footer-total">
+        <span>Total</span>
+        <strong>{{ total() | mxn }}</strong>
+      </div>
+    </div>
     <ion-button expand="block" [disabled]="saving() || cart().length === 0" (click)="checkout()">
       Cobrar
     </ion-button>
-  </div>
-</ion-content>
+  </ion-toolbar>
+</ion-footer>

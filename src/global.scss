@@ -66,4 +66,89 @@ ion-content {
 ion-fab-button {
   --background: var(--ion-color-primary);
   --color: var(--ion-color-primary-contrast);
+  --box-shadow: var(--app-shadow);
+}
+
+ion-list[inset='true'] {
+  border-radius: var(--app-radius);
+  box-shadow: var(--app-shadow);
+  margin-inline: 12px;
+}
+
+ion-segment {
+  --background: var(--ion-color-light);
+  border-radius: 12px;
+  padding: 4px;
+}
+
+ion-segment-button {
+  --indicator-color: var(--ion-color-primary);
+  --color: var(--ion-color-medium);
+  --color-checked: var(--ion-color-primary-contrast);
+  font-weight: 600;
+  min-height: 40px;
+}
+
+.empty-state,
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 3.5rem 1.5rem;
+  color: var(--ion-color-medium);
+  gap: 0.35rem;
+}
+
+.empty-state ion-icon,
+.empty ion-icon {
+  font-size: 2.75rem;
+  opacity: 0.85;
+  margin-bottom: 0.25rem;
+}
+
+.empty-state h2,
+.empty h2 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--ion-text-color);
+}
+
+.empty-state p,
+.empty p {
+  margin: 0;
+  max-width: 280px;
+  line-height: 1.45;
+}
+
+.form-actions {
+  padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom));
+}
+
+.page-section-title {
+  margin: 1rem 1.25rem 0.35rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ion-color-medium);
+}
+
+.end-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+  min-width: 4.5rem;
+}
+
+ion-tab-bar {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  box-shadow: 0 -1px 0 var(--ion-border-color);
+}
+
+ion-searchbar {
+  --border-radius: 12px;
+  --box-shadow: var(--app-shadow);
 }

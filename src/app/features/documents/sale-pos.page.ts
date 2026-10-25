@@ -6,6 +6,7 @@ import {
   IonButton,
   IonButtons,
   IonContent,
+  IonFooter,
   IonHeader,
   IonIcon,
   IonInput,
@@ -25,6 +26,7 @@ import { PAYMENT_METHOD_LABELS } from '../../core/labels';
 import { BarcodeScanService } from '../../core/media/barcode-scan.service';
 import { documentSubtotal, documentTotal, pickUnitPrice } from '../../core/pricing';
 import { PaymentMethod, ProductStock } from '../../core/models';
+import { ProductThumbComponent } from '../../shared/product-thumb.component';
 import { MxnPipe } from '../../shared/mxn.pipe';
 import { ProductService } from '../products/product.service';
 import { DocumentService } from './document.service';
@@ -54,6 +56,7 @@ interface CartLine {
     IonButtons,
     IonBackButton,
     IonContent,
+    IonFooter,
     IonSearchbar,
     IonButton,
     IonIcon,
@@ -65,6 +68,7 @@ interface CartLine {
     IonSelect,
     IonSelectOption,
     MxnPipe,
+    ProductThumbComponent,
   ],
 })
 export class SalePosPage {

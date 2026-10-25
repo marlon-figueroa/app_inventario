@@ -22,7 +22,14 @@
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 0.5rem;
-  padding: 0 1rem 1rem;
+  padding: 0 12px 1rem;
+
+  ion-button {
+    margin: 0;
+    --border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.8125rem;
+  }
 }
 
 .section-title {
