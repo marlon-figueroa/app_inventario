@@ -1,0 +1,7 @@
+{
+  "name": "Inventario",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

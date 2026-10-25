@@ -1,0 +1,88 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Inicio</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="reload($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  @if (loading()) {
+    <div class="loading">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+  } @else {
+    <div class="stats">
+      <div class="stat-card">
+        <span>Productos activos</span>
+        <strong>{{ summary().productCount }}</strong>
+      </div>
+      <div class="stat-card">
+        <span>Valor inventario</span>
+        <strong>{{ summary().inventoryValue | mxn }}</strong>
+      </div>
+      <div class="stat-card">
+        <span>Stock bajo</span>
+        <strong>{{ summary().lowStockCount }}</strong>
+      </div>
+    </div>
+
+    <ion-list [inset]="true">
+      <ion-item lines="none">
+        <ion-label><h2>Este mes</h2></ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label>Entradas</ion-label>
+        <ion-note slot="end">{{ monthTotals().entryQty }} uds.</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>Salidas</ion-label>
+        <ion-note slot="end">{{ monthTotals().exitQty }} uds.</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>Ajustes netos</ion-label>
+        <ion-note slot="end">{{ monthTotals().adjustmentQty }} uds.</ion-note>
+      </ion-item>
+    </ion-list>
+
+    @if (hasLowStock()) {
+      <ion-list [inset]="true">
+        <ion-item lines="none">
+          <ion-label><h2>Stock bajo</h2></ion-label>
+        </ion-item>
+        @for (p of lowStock(); track p.id) {
+          <ion-item [routerLink]="['/tabs/productos', p.id]" detail="true">
+            <ion-label>
+              <h3>{{ p.name }}</h3>
+              <p>{{ p.sku }} · mín. {{ p.minStock }}</p>
+            </ion-label>
+            <ion-badge color="warning" slot="end">{{ p.stock }}</ion-badge>
+          </ion-item>
+        }
+      </ion-list>
+    }
+
+    <ion-list [inset]="true">
+      <ion-item lines="none">
+        <ion-label><h2>Últimos movimientos</h2></ion-label>
+      </ion-item>
+      @if (recentMovements().length === 0) {
+        <ion-item>
+          <ion-label>Sin actividad reciente.</ion-label>
+        </ion-item>
+      } @else {
+        @for (m of recentMovements(); track m.id) {
+          <ion-item>
+            <ion-label>
+              <h3>{{ m.productName }}</h3>
+              <p>{{ m.date | displayDate }} · {{ m.reason | movementReasonLabel: $any(m.type) }}</p>
+            </ion-label>
+            <ion-note slot="end">{{ m.type | movementTypeLabel }}</ion-note>
+          </ion-item>
+        }
+      }
+    </ion-list>
+  }
+</ion-content>

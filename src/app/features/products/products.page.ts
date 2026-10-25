@@ -1,0 +1,131 @@
+import { Component, computed, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import {
+  AlertController,
+  IonBadge,
+  IonContent,
+  IonFab,
+  IonFabButton,
+  IonHeader,
+  IonIcon,
+  IonItem,
+  IonItemOption,
+  IonItemOptions,
+  IonItemSliding,
+  IonLabel,
+  IonList,
+  IonNote,
+  IonRefresher,
+  IonRefresherContent,
+  IonSearchbar,
+  IonSelect,
+  IonSelectOption,
+  IonTitle,
+  IonToolbar,
+} from '@ionic/angular';
+import { ProductStock } from '../../core/models';
+import { ProductUnitLabelPipe } from '../../shared/label.pipe';
+import { MxnPipe } from '../../shared/mxn.pipe';
+import { BrandService } from '../catalogs/brand.service';
+import { CategoryService } from '../catalogs/category.service';
+import { SupplierService } from '../catalogs/supplier.service';
+import { ProductListFilters, ProductService } from './product.service';
+
+@Component({
+  selector: 'app-products',
+  templateUrl: './products.page.html',
+  styleUrls: ['./products.page.scss'],
+  imports: [
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonRefresher,
+    IonRefresherContent,
+    IonSearchbar,
+    IonSelect,
+    IonSelectOption,
+    IonList,
+    IonItem,
+    IonItemSliding,
+    IonItemOptions,
+    IonItemOption,
+    IonLabel,
+    IonNote,
+    IonBadge,
+    IonIcon,
+    IonFab,
+    IonFabButton,
+    RouterLink,
+    MxnPipe,
+    ProductUnitLabelPipe,
+  ],
+})
+export class ProductsPage {
+  private productsApi = inject(ProductService);
+  private categoriesApi = inject(CategoryService);
+  private brandsApi = inject(BrandService);
+  private suppliersApi = inject(SupplierService);
+  private alertCtrl = inject(AlertController);
+
+  products = signal<ProductStock[]>([]);
+  search = signal('');
+  categoryId = signal('');
+  brandId = signal('');
+  supplierId = signal('');
+  lowStockOnly = signal(false);
+
+  categories = signal<{ id: string; name: string }[]>([]);
+  brands = signal<{ id: string; name: string }[]>([]);
+  suppliers = signal<{ id: string; name: string }[]>([]);
+
+  filteredCount = computed(() => this.products().length);
+
+  async ionViewWillEnter(): Promise<void> {
+    const [categories, brands, suppliers] = await Promise.all([
+      this.categoriesApi.list(),
+      this.brandsApi.list(),
+      this.suppliersApi.list(true),
+    ]);
+    this.categories.set(categories.map((c) => ({ id: c.id, name: c.name })));
+    this.brands.set(brands.map((b) => ({ id: b.id, name: b.name })));
+    this.suppliers.set(suppliers.map((s) => ({ id: s.id, name: s.name })));
+    await this.reload();
+  }
+
+  async reload(event?: CustomEvent): Promise<void> {
+    const filters: ProductListFilters = {
+      search: this.search(),
+      categoryId: this.categoryId() || undefined,
+      brandId: this.brandId() || undefined,
+      supplierId: this.supplierId() || undefined,
+      lowStockOnly: this.lowStockOnly(),
+    };
+    this.products.set(await this.productsApi.list(filters));
+    await event?.detail.complete();
+  }
+
+  onSearch(event: CustomEvent): void {
+    this.search.set(String(event.detail.value ?? ''));
+    void this.reload();
+  }
+
+  async confirmDelete(product: ProductStock): Promise<void> {
+    const alert = await this.alertCtrl.create({
+      header: 'Eliminar producto',
+      message: `Se borrará ${product.name} y todo su historial de movimientos.`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: async () => {
+            await this.productsApi.remove(product.id);
+            await this.reload();
+          },
+        },
+      ],
+    });
+    await alert.present();
+  }
+}

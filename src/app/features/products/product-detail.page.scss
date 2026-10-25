@@ -1,0 +1,31 @@
+.summary {
+  margin: 16px;
+  padding: 20px;
+  border-radius: 20px;
+  background: var(--ion-card-background, var(--ion-item-background, #fff));
+}
+
+.summary h1 {
+  margin: 4px 0 12px;
+}
+
+.meta,
+.empty {
+  color: var(--ion-color-medium);
+}
+
+.actions {
+  padding: 0 16px 8px;
+}
+
+.action-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem;
+  padding: 0 1rem 1rem;
+}
+
+.section-title {
+  margin: 8px 20px 0;
+  font-size: 1rem;
+}

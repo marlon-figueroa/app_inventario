@@ -1,0 +1,122 @@
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin: 1rem;
+}
+
+.stat-card {
+  padding: 1rem;
+  border-radius: 16px;
+  background: var(--ion-card-background, var(--ion-item-background, #fff));
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--ion-color-medium);
+
+  strong {
+    font-size: 1.1rem;
+    color: var(--ion-text-color);
+  }
+}
+
+.hero {
+  margin: 16px;
+  padding: 20px;
+  border-radius: 20px;
+  background: linear-gradient(160deg, var(--app-gold-deep) 0%, var(--app-gold) 48%, #4a3a16 100%);
+  color: #fff;
+}
+
+.hero h1 {
+  margin: 4px 0 16px;
+  font-size: 2rem;
+}
+
+.eyebrow {
+  margin: 0;
+  opacity: 0.8;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.hero-grid strong {
+  display: block;
+  margin-top: 4px;
+}
+
+.section-title {
+  margin: 8px 20px 0;
+  font-size: 1rem;
+}
+
+.chart {
+  margin: 12px 16px 8px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: var(--ion-card-background, var(--ion-item-background, #fff));
+}
+
+.chart-row {
+  display: grid;
+  grid-template-columns: 1.2fr 2fr auto;
+  gap: 8px;
+  align-items: center;
+  margin: 8px 0;
+  font-size: 0.85rem;
+}
+
+.bar-track {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(var(--ion-color-primary-rgb), 0.15);
+}
+
+.bar-fill {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--ion-color-primary);
+}
+
+.chart-row:nth-child(3n + 2) .bar-fill {
+  background: var(--app-gold-deep);
+}
+
+.chart-row:nth-child(3n + 3) .bar-fill {
+  background: var(--ion-color-tertiary);
+}
+
+.end-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.center-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--ion-color-medium);
+}
+
+.center-state ion-icon {
+  font-size: 42px;
+  margin-bottom: 8px;
+}

@@ -1,0 +1,90 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/productos"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle</ion-title>
+    <ion-buttons slot="end">
+      <ion-button [routerLink]="['/tabs/productos', id(), 'editar']">Editar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (product(); as p) {
+    <ion-list [inset]="true">
+      <ion-item>
+        <ion-label>
+          <h1>{{ p.name }}</h1>
+          <p>{{ p.sku }}</p>
+        </ion-label>
+        @if (p.lowStock) {
+          <ion-badge color="warning" slot="end">Stock bajo</ion-badge>
+        }
+      </ion-item>
+      <ion-item>
+        <ion-label>Categoría</ion-label>
+        <ion-note slot="end">{{ p.categoryName }}</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>Marca / Proveedor</ion-label>
+        <ion-note slot="end">{{ p.brandName }} · {{ p.supplierName }}</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>Existencia</ion-label>
+        <ion-note slot="end">{{ p.stock }} {{ p.unit | productUnitLabel }}</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>Costo promedio</ion-label>
+        <ion-note slot="end">{{ p.avgCost | mxn }}</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>Valor inventario</ion-label>
+        <ion-note slot="end">{{ p.inventoryValue | mxn }}</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>Precio venta</ion-label>
+        <ion-note slot="end">{{ p.salePrice | mxn }}</ion-note>
+      </ion-item>
+    </ion-list>
+
+    <div class="action-row">
+      <ion-button expand="block" [routerLink]="['/tabs/movimientos/nuevo']" [queryParams]="movementQuery('entry')">
+        Entrada
+      </ion-button>
+      <ion-button expand="block" color="secondary" [routerLink]="['/tabs/movimientos/nuevo']" [queryParams]="movementQuery('exit')">
+        Salida
+      </ion-button>
+      <ion-button expand="block" color="medium" [routerLink]="['/tabs/movimientos/nuevo']" [queryParams]="movementQuery('adjustment')">
+        Ajuste
+      </ion-button>
+    </div>
+
+    <ion-list [inset]="true">
+      <ion-item lines="none">
+        <ion-label><h2>Últimos movimientos</h2></ion-label>
+      </ion-item>
+      @if (movements().length === 0) {
+        <ion-item>
+          <ion-label>Sin movimientos aún.</ion-label>
+        </ion-item>
+      } @else {
+        @for (m of movements(); track m.id) {
+          <ion-item>
+            <ion-label>
+              <h3>{{ m.type | movementTypeLabel }}</h3>
+              <p>{{ m.date | displayDate }} · {{ m.reason | movementReasonLabel: m.type }}</p>
+            </ion-label>
+            <ion-note slot="end">
+              @if (m.type === 'adjustment') {
+                {{ m.quantity > 0 ? '+' : '' }}{{ m.quantity }}
+              } @else {
+                {{ m.quantity }}
+              }
+            </ion-note>
+          </ion-item>
+        }
+      }
+    </ion-list>
+  }
+</ion-content>

@@ -1,0 +1,111 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Ajustes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-list [inset]="true">
+    <ion-item>
+      <ion-label>
+        <h2>Catálogos</h2>
+        <p>Proveedores, marcas y categorías.</p>
+      </ion-label>
+    </ion-item>
+    <ion-item button routerLink="/tabs/ajustes/proveedores" detail="true">
+      <ion-icon name="business-outline" slot="start"></ion-icon>
+      <ion-label>Proveedores</ion-label>
+    </ion-item>
+    <ion-item button routerLink="/tabs/ajustes/marcas" detail="true">
+      <ion-icon name="pricetag-outline" slot="start"></ion-icon>
+      <ion-label>Marcas</ion-label>
+    </ion-item>
+    <ion-item button routerLink="/tabs/ajustes/categorias" detail="true">
+      <ion-icon name="folder-outline" slot="start"></ion-icon>
+      <ion-label>Categorías</ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ion-list [inset]="true">
+    <ion-item>
+      <ion-label>
+        <h2>Apariencia</h2>
+        <p>Elige el tema claro, oscuro o el del sistema.</p>
+      </ion-label>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-segment [value]="theme.preference()" (ionChange)="setTheme($event.detail.value)">
+        <ion-segment-button value="light">
+          <ion-icon name="sunny-outline"></ion-icon>
+          <ion-label>Claro</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="dark">
+          <ion-icon name="moon-outline"></ion-icon>
+          <ion-label>Oscuro</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="system">
+          <ion-icon name="phone-portrait-outline"></ion-icon>
+          <ion-label>Sistema</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </ion-item>
+  </ion-list>
+
+  <ion-list [inset]="true">
+    <ion-item>
+      <ion-label>
+        <h2>Portabilidad</h2>
+        <p>Exporta o restaura un archivo JSON con todo el inventario.</p>
+      </ion-label>
+    </ion-item>
+    <ion-item button (click)="exportBackup()" [disabled]="busy()">
+      <ion-icon name="download-outline" slot="start"></ion-icon>
+      <ion-label>Exportar respaldo</ion-label>
+    </ion-item>
+    <ion-item button (click)="pickBackup()" [disabled]="busy()">
+      <ion-icon name="cloud-upload-outline" slot="start"></ion-icon>
+      <ion-label>Importar respaldo</ion-label>
+    </ion-item>
+    <ion-item button (click)="clearData()">
+      <ion-icon name="trash-outline" slot="start" color="dark"></ion-icon>
+      <ion-label color="dark">Vaciar datos</ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ion-list [inset]="true">
+    <ion-item>
+      <ion-label>
+        <h2>Instalación</h2>
+        <p>La app funciona sin internet.</p>
+      </ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-label>Plataforma actual</ion-label>
+      <ion-note slot="end">{{ platform }}</ion-note>
+    </ion-item>
+    <ion-item>
+      <ion-label>Almacenamiento</ion-label>
+      <ion-note slot="end">SQLite local</ion-note>
+    </ion-item>
+  </ion-list>
+
+  <ion-list [inset]="true">
+    <ion-item lines="none">
+      <img class="app-logo" [src]="theme.logoSrc()" alt="Logo Inventario" slot="start" />
+      <ion-label>
+        <h2>Inventario</h2>
+        <p>Marlon Ernesto Figueroa Fuentes</p>
+      </ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-label>
+        <p class="app-about">
+          Gestor de inventario offline: productos por categoría y marca (según proveedor),
+          entradas, salidas, ajustes con costo promedio, reportes y respaldo JSON.
+        </p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <input #fileInput type="file" accept="application/json,.json" hidden (change)="onFile($event)" />
+</ion-content>

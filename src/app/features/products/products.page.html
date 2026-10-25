@@ -1,0 +1,89 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Productos</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar placeholder="Buscar por nombre o SKU" (ionInput)="onSearch($event)"></ion-searchbar>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-select
+      placeholder="Categoría"
+      interface="popover"
+      [value]="categoryId()"
+      (ionChange)="categoryId.set($event.detail.value ?? ''); reload()"
+    >
+      <ion-select-option value="">Todas</ion-select-option>
+      @for (c of categories(); track c.id) {
+        <ion-select-option [value]="c.id">{{ c.name }}</ion-select-option>
+      }
+    </ion-select>
+    <ion-select
+      placeholder="Marca"
+      interface="popover"
+      [value]="brandId()"
+      (ionChange)="brandId.set($event.detail.value ?? ''); reload()"
+    >
+      <ion-select-option value="">Todas</ion-select-option>
+      @for (b of brands(); track b.id) {
+        <ion-select-option [value]="b.id">{{ b.name }}</ion-select-option>
+      }
+    </ion-select>
+    <ion-select
+      placeholder="Proveedor"
+      interface="popover"
+      [value]="supplierId()"
+      (ionChange)="supplierId.set($event.detail.value ?? ''); reload()"
+    >
+      <ion-select-option value="">Todos</ion-select-option>
+      @for (s of suppliers(); track s.id) {
+        <ion-select-option [value]="s.id">{{ s.name }}</ion-select-option>
+      }
+    </ion-select>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="reload($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  @if (products().length === 0) {
+    <div class="empty">
+      <ion-icon name="cube-outline"></ion-icon>
+      <h2>Sin productos</h2>
+      <p>Registra artículos con categoría, marca y proveedor.</p>
+    </div>
+  } @else {
+    <ion-list [inset]="true">
+      @for (product of products(); track product.id) {
+        <ion-item-sliding>
+          <ion-item [routerLink]="['/tabs/productos', product.id]" detail="true">
+            <ion-label>
+              <h2>{{ product.name }}</h2>
+              <p>{{ product.sku }} · {{ product.categoryName }} · {{ product.brandName }}</p>
+              <p>{{ product.supplierName }}</p>
+            </ion-label>
+            <div class="end-meta" slot="end">
+              @if (product.lowStock) {
+                <ion-badge color="warning">Bajo</ion-badge>
+              }
+              <ion-note>{{ product.stock }} {{ product.unit | productUnitLabel }}</ion-note>
+              <ion-note>{{ product.salePrice | mxn }}</ion-note>
+            </div>
+          </ion-item>
+          <ion-item-options side="end">
+            <ion-item-option color="danger" (click)="confirmDelete(product)">
+              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+      }
+    </ion-list>
+  }
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button routerLink="/tabs/productos/nuevo">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

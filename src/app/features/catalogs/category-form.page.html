@@ -1,0 +1,29 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/ajustes/categorias"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ isEdit ? 'Editar categoría' : 'Nueva categoría' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <form [formGroup]="form" (ngSubmit)="save()">
+    <ion-list [inset]="true">
+      <ion-item>
+        <ion-input label="Nombre" labelPlacement="stacked" formControlName="name" required></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-textarea
+          label="Descripción"
+          labelPlacement="stacked"
+          formControlName="description"
+          autoGrow="true"
+        ></ion-textarea>
+      </ion-item>
+    </ion-list>
+    <div class="form-actions">
+      <ion-button expand="block" type="submit" [disabled]="saving()">Guardar</ion-button>
+    </div>
+  </form>
+</ion-content>

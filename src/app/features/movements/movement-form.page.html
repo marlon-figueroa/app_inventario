@@ -1,0 +1,108 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/movimientos"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ isEdit ? 'Editar movimiento' : 'Nuevo movimiento' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (!isEdit) {
+    <ion-segment [value]="movementType()" (ionChange)="setType($any($event.detail.value))">
+      <ion-segment-button value="entry">
+        <ion-label>Entrada</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="exit">
+        <ion-label>Salida</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="adjustment">
+        <ion-label>Ajuste</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="save()">
+    <ion-list [inset]="true">
+      <ion-item>
+        <ion-select
+          label="Producto"
+          labelPlacement="stacked"
+          formControlName="productId"
+          interface="popover"
+          (ionChange)="onProductChange($event.detail.value)"
+        >
+          @for (p of products(); track p.id) {
+            <ion-select-option [value]="p.id">{{ p.name }} ({{ p.sku }})</ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+
+      @if (isAdjustment && !isEdit) {
+        <ion-item>
+          <ion-label>
+            <p>Stock actual</p>
+            <h3>{{ currentStock() }}</h3>
+          </ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-input
+            label="Cantidad contada"
+            labelPlacement="stacked"
+            type="number"
+            formControlName="countedQuantity"
+            required
+          ></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-select label="Motivo" labelPlacement="stacked" formControlName="reason" interface="popover">
+            @for (r of adjustmentReasons; track r[0]) {
+              <ion-select-option [value]="r[0]">{{ r[1] }}</ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+      } @else {
+        <ion-item>
+          <ion-input label="Cantidad" labelPlacement="stacked" type="number" formControlName="quantity" required></ion-input>
+        </ion-item>
+        @if (movementType() === 'entry') {
+          <ion-item>
+            <ion-input label="Costo unitario" labelPlacement="stacked" type="number" formControlName="unitCost" required></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-select label="Motivo" labelPlacement="stacked" formControlName="reason" interface="popover">
+              @for (r of entryReasons; track r[0]) {
+                <ion-select-option [value]="r[0]">{{ r[1] }}</ion-select-option>
+              }
+            </ion-select>
+          </ion-item>
+        }
+        @if (movementType() === 'exit') {
+          <ion-item>
+            <ion-input label="Precio unitario (venta)" labelPlacement="stacked" type="number" formControlName="unitPrice"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-select label="Motivo" labelPlacement="stacked" formControlName="reason" interface="popover">
+              @for (r of exitReasons; track r[0]) {
+                <ion-select-option [value]="r[0]">{{ r[1] }}</ion-select-option>
+              }
+            </ion-select>
+          </ion-item>
+        }
+      }
+
+      <ion-item>
+        <ion-input label="Referencia (factura/folio)" labelPlacement="stacked" formControlName="reference"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input label="Fecha" labelPlacement="stacked" type="date" formControlName="date"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-textarea label="Notas" labelPlacement="stacked" formControlName="notes" autoGrow="true"></ion-textarea>
+      </ion-item>
+    </ion-list>
+    <div class="form-actions">
+      <ion-button expand="block" type="submit" [disabled]="saving()">Guardar</ion-button>
+    </div>
+  </form>
+</ion-content>

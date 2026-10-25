@@ -1,0 +1,19 @@
+.app-logo {
+  width: 48px;
+  height: 48px;
+  margin-inline-end: 16px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.app-about {
+  white-space: normal;
+  line-height: 1.45;
+  color: var(--ion-color-medium);
+}
+
+ion-segment {
+  width: 100%;
+  padding: 4px 0 8px;
+}
+

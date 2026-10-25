@@ -1,0 +1,83 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Movimientos</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-select
+      placeholder="Tipo"
+      interface="popover"
+      [value]="typeFilter()"
+      (ionChange)="typeFilter.set($event.detail.value ?? ''); reload()"
+    >
+      <ion-select-option value="">Todos</ion-select-option>
+      <ion-select-option value="entry">Entrada</ion-select-option>
+      <ion-select-option value="exit">Salida</ion-select-option>
+      <ion-select-option value="adjustment">Ajuste</ion-select-option>
+    </ion-select>
+    <ion-select
+      placeholder="Producto"
+      interface="popover"
+      [value]="productFilter()"
+      (ionChange)="productFilter.set($event.detail.value ?? ''); reload()"
+    >
+      <ion-select-option value="">Todos</ion-select-option>
+      @for (p of products(); track p.id) {
+        <ion-select-option [value]="p.id">{{ p.name }}</ion-select-option>
+      }
+    </ion-select>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="reload($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  @if (movements().length === 0) {
+    <div class="empty">
+      <ion-icon name="swap-vertical-outline"></ion-icon>
+      <h2>Sin movimientos</h2>
+      <p>Registra entradas, salidas o ajustes de inventario.</p>
+    </div>
+  } @else {
+    <ion-list [inset]="true">
+      @for (m of movements(); track m.id) {
+        <ion-item-sliding>
+          <ion-item [routerLink]="['/tabs/movimientos', m.id, 'editar']" detail="true">
+            <ion-label>
+              <h2>{{ m.productName }}</h2>
+              <p>{{ m.date | displayDate }} · {{ m.reason | movementReasonLabel: m.type }}</p>
+              @if (m.reference) {
+                <p>Ref. {{ m.reference }}</p>
+              }
+            </ion-label>
+            <div class="end-meta" slot="end">
+              <ion-badge [color]="typeColor(m.type)">{{ m.type | movementTypeLabel }}</ion-badge>
+              <ion-note>
+                @if (m.type === 'adjustment') {
+                  {{ m.quantity > 0 ? '+' : '' }}{{ m.quantity }}
+                } @else {
+                  {{ m.quantity }}
+                }
+              </ion-note>
+              @if (m.type === 'exit' && m.unitPrice) {
+                <ion-note>{{ m.unitPrice | mxn }}</ion-note>
+              }
+            </div>
+          </ion-item>
+          <ion-item-options side="end">
+            <ion-item-option color="danger" (click)="confirmDelete(m)">
+              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+      }
+    </ion-list>
+  }
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button routerLink="/tabs/movimientos/nuevo">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

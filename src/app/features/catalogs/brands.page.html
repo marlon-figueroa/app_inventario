@@ -1,0 +1,46 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/ajustes"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Marcas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="reload($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  @if (items().length === 0) {
+    <div class="empty">
+      <ion-icon name="pricetag-outline"></ion-icon>
+      <h2>Sin marcas</h2>
+      <p>Cada marca pertenece a un proveedor.</p>
+    </div>
+  } @else {
+    <ion-list [inset]="true">
+      @for (item of items(); track item.id) {
+        <ion-item-sliding>
+          <ion-item [routerLink]="['/tabs/ajustes/marcas', item.id, 'editar']" detail="true">
+            <ion-label>
+              <h2>{{ item.name }}</h2>
+              <p>{{ item.supplierName }}</p>
+            </ion-label>
+          </ion-item>
+          <ion-item-options side="end">
+            <ion-item-option color="danger" (click)="confirmDelete(item)">
+              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+      }
+    </ion-list>
+  }
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button routerLink="/tabs/ajustes/marcas/nuevo">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

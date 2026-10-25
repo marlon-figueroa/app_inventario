@@ -1,0 +1,63 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/productos"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ isEdit ? 'Editar producto' : 'Nuevo producto' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <form [formGroup]="form" (ngSubmit)="save()">
+    <ion-list [inset]="true">
+      <ion-item>
+        <ion-input label="SKU" labelPlacement="stacked" formControlName="sku" required></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input label="Nombre" labelPlacement="stacked" formControlName="name" required></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-select label="Categoría" labelPlacement="stacked" formControlName="categoryId" interface="popover">
+          @for (c of categories(); track c.id) {
+            <ion-select-option [value]="c.id">{{ c.name }}</ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-select label="Marca" labelPlacement="stacked" formControlName="brandId" interface="popover">
+          @for (b of brands(); track b.id) {
+            <ion-select-option [value]="b.id">{{ b.name }}</ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+      <ion-item lines="none">
+        <ion-label>
+          <p>Proveedor (por marca)</p>
+          <h3>{{ selectedSupplier() }}</h3>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-select label="Unidad" labelPlacement="stacked" formControlName="unit" interface="popover">
+          @for (u of units; track u[0]) {
+            <ion-select-option [value]="u[0]">{{ u[1] }}</ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-input label="Precio de venta" labelPlacement="stacked" type="number" formControlName="salePrice"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input label="Stock mínimo" labelPlacement="stacked" type="number" formControlName="minStock"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-textarea label="Notas" labelPlacement="stacked" formControlName="notes" autoGrow="true"></ion-textarea>
+      </ion-item>
+      <ion-item>
+        <ion-toggle formControlName="active">Activo</ion-toggle>
+      </ion-item>
+    </ion-list>
+    <div class="form-actions">
+      <ion-button expand="block" type="submit" [disabled]="saving()">Guardar</ion-button>
+    </div>
+  </form>
+</ion-content>

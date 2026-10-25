@@ -1,0 +1,26 @@
+{
+  "name": "Inventario",
+  "short_name": "Inventario",
+  "description": "Inventario de deudas, tarjetas, préstamos y extrafinanciamientos.",
+  "theme_color": "#8f7320",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "./",
+  "start_url": "./",
+  "lang": "es-MX",
+  "icons": [
+    {
+      "src": "assets/icon/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

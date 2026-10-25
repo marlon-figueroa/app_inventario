@@ -1,0 +1,91 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Reportes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-segment [value]="period()" (ionChange)="setPeriod($event.detail.value)">
+    <ion-segment-button value="day"><ion-label>Día</ion-label></ion-segment-button>
+    <ion-segment-button value="week"><ion-label>Semana</ion-label></ion-segment-button>
+    <ion-segment-button value="month"><ion-label>Mes</ion-label></ion-segment-button>
+    <ion-segment-button value="year"><ion-label>Año</ion-label></ion-segment-button>
+  </ion-segment>
+
+  <div class="period-nav">
+    <ion-button fill="clear" (click)="shift(-1)">Anterior</ion-button>
+    <strong>{{ caption() }}</strong>
+    <ion-button fill="clear" (click)="shift(1)">Siguiente</ion-button>
+  </div>
+
+  @if (report(); as current) {
+    <div class="totals">
+      <article>
+        <span>Entradas (costo)</span>
+        <strong>{{ current.totals.entryCost | mxn }}</strong>
+        <small>{{ current.totals.entryQty }} uds.</small>
+      </article>
+      <article>
+        <span>Salidas (ingreso)</span>
+        <strong class="success">{{ current.totals.exitRevenue | mxn }}</strong>
+        <small>{{ current.totals.exitQty }} uds.</small>
+      </article>
+      <article>
+        <span>Costo vendido</span>
+        <strong>{{ current.totals.exitCost | mxn }}</strong>
+      </article>
+      <article>
+        <span>Margen</span>
+        <strong [class.danger]="current.totals.margin < 0" [class.success]="current.totals.margin >= 0">
+          {{ current.totals.margin | mxn }}
+        </strong>
+        <small>Ajustes {{ current.totals.adjustmentQty }} uds.</small>
+      </article>
+    </div>
+
+    <ion-segment [value]="groupTab()" (ionChange)="groupTab.set($any($event.detail.value))">
+      <ion-segment-button value="category"><ion-label>Categoría</ion-label></ion-segment-button>
+      <ion-segment-button value="brand"><ion-label>Marca</ion-label></ion-segment-button>
+      <ion-segment-button value="supplier"><ion-label>Proveedor</ion-label></ion-segment-button>
+    </ion-segment>
+
+    <h2 class="section-title">Por agrupación</h2>
+    @if (groupedRows(current).length === 0) {
+      <p class="empty">No hay movimientos en este periodo.</p>
+    } @else {
+      <ion-list [inset]="true">
+        @for (row of groupedRows(current); track row.groupId) {
+          <ion-item>
+            <ion-label>
+              <h2>{{ row.groupName }}</h2>
+              <p>Entradas {{ row.entryCost | mxn }} · Salidas {{ row.exitRevenue | mxn }}</p>
+            </ion-label>
+            <ion-note slot="end">{{ row.margin | mxn }}</ion-note>
+          </ion-item>
+        }
+      </ion-list>
+    }
+
+    <h2 class="section-title">Movimientos del periodo</h2>
+    <ion-list [inset]="true">
+      @for (movement of current.movements; track movement.id) {
+        <ion-item [routerLink]="['/tabs/movimientos', movement.id, 'editar']" detail="true">
+          <ion-label>
+            <h2>{{ movement.type | movementTypeLabel }}</h2>
+            <p>{{ movement.productName }} · {{ movement.date | displayDate }}</p>
+            <p>{{ movement.reason | movementReasonLabel: movement.type }}</p>
+          </ion-label>
+          <ion-note slot="end">
+            @if (movement.type === 'exit' && movement.unitPrice) {
+              {{ movement.unitPrice | mxn }}
+            } @else if (movement.type === 'entry' && movement.unitCost) {
+              {{ movement.unitCost | mxn }}
+            } @else {
+              {{ movement.quantity }}
+            }
+          </ion-note>
+        </ion-item>
+      }
+    </ion-list>
+  }
+</ion-content>
