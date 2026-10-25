@@ -8,6 +8,21 @@ export type ImageEntityKind = 'products' | 'brands';
 const MAX_DIMENSION = 1024;
 const JPEG_QUALITY = 0.8;
 
+let pwaElementsReady: Promise<void> | null = null;
+
+/** UI de cámara en navegador (@ionic/pwa-elements). Solo se carga al tomar/elegir foto. */
+function ensurePwaElements(): Promise<void> {
+  if (Capacitor.getPlatform() !== 'web') {
+    return Promise.resolve();
+  }
+  if (!pwaElementsReady) {
+    pwaElementsReady = import('@ionic/pwa-elements/loader').then(({ defineCustomElements }) =>
+      defineCustomElements(window)
+    );
+  }
+  return pwaElementsReady;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ImageService {
   readonly productPlaceholder = 'assets/img/placeholder-product.svg';
@@ -18,6 +33,7 @@ export class ImageService {
   }
 
   async pick(source: 'camera' | 'gallery', kind: ImageEntityKind, entityId: string): Promise<string> {
+    await ensurePwaElements();
     const photo = await Camera.getPhoto({
       quality: Math.round(JPEG_QUALITY * 100),
       allowEditing: false,
