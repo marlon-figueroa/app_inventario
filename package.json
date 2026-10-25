@@ -54,7 +54,7 @@
     "jsdom": "^26.0.0",
     "typescript": "~6.0.0",
     "typescript-eslint": "^8.61.0",
-    "vitest": "^4.0.8"
+    "vitest": "^4.1.12"
   },
   "description": "Gestor de inventario offline con SQLite: productos, entradas, salidas, ajustes y reportes"
 }
