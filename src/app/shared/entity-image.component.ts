@@ -6,6 +6,7 @@ import {
   IonImg,
   IonLabel,
   IonSpinner,
+  ToastController,
 } from '@ionic/angular';
 import { ImageEntityKind, ImageService } from '../core/media/image.service';
 
@@ -19,9 +20,9 @@ import { ImageEntityKind, ImageService } from '../core/media/image.service';
         <ion-img [src]="displayUrl()" (ionError)="onImageError()"></ion-img>
       }
       @if (editable()) {
-        <ion-button size="small" fill="outline" (click)="openActions()">
+        <ion-button size="small" fill="outline" (click)="openActions()" [disabled]="busy()">
           <ion-icon slot="start" name="camera-outline"></ion-icon>
-          <ion-label>Imagen</ion-label>
+          <ion-label>{{ busy() ? 'Cargando…' : 'Imagen' }}</ion-label>
         </ion-button>
       }
     </div>
@@ -51,6 +52,7 @@ import { ImageEntityKind, ImageService } from '../core/media/image.service';
 export class EntityImageComponent {
   private images = inject(ImageService);
   private actionSheet = inject(ActionSheetController);
+  private toastCtrl = inject(ToastController);
 
   kind = input.required<ImageEntityKind>();
   entityId = input.required<string>();
@@ -61,7 +63,7 @@ export class EntityImageComponent {
 
   displayUrl = signal('');
   loading = signal(true);
-  private usePlaceholder = false;
+  busy = signal(false);
 
   constructor() {
     effect(() => {
@@ -78,12 +80,16 @@ export class EntityImageComponent {
         {
           text: 'Tomar foto',
           icon: 'camera-outline',
-          handler: () => void this.capture('camera'),
+          handler: () => {
+            void this.capture('camera');
+          },
         },
         {
           text: 'Elegir de galería',
           icon: 'images-outline',
-          handler: () => void this.capture('gallery'),
+          handler: () => {
+            void this.capture('gallery');
+          },
         },
         ...(this.imagePath()
           ? [
@@ -91,7 +97,9 @@ export class EntityImageComponent {
                 text: 'Quitar imagen',
                 role: 'destructive' as const,
                 icon: 'trash-outline',
-                handler: () => void this.removeImage(),
+                handler: () => {
+                  void this.removeImage();
+                },
               },
             ]
           : []),
@@ -102,13 +110,11 @@ export class EntityImageComponent {
   }
 
   onImageError(): void {
-    this.usePlaceholder = true;
     this.displayUrl.set(this.images.placeholderFor(this.kind()));
   }
 
   private async refreshDisplay(path: string | null, kind: ImageEntityKind): Promise<void> {
     this.loading.set(true);
-    this.usePlaceholder = false;
     try {
       const url = await this.images.toDisplayUrl(path, kind);
       this.displayUrl.set(url);
@@ -118,6 +124,10 @@ export class EntityImageComponent {
   }
 
   private async capture(source: 'camera' | 'gallery'): Promise<void> {
+    if (this.busy()) {
+      return;
+    }
+    this.busy.set(true);
     try {
       const previous = this.imagePath();
       const path = await this.images.pick(source, this.kind(), this.entityId());
@@ -125,8 +135,25 @@ export class EntityImageComponent {
         await this.images.remove(previous);
       }
       this.imagePathChange.emit(path);
-    } catch {
-      // usuario canceló o error de permisos
+      const toast = await this.toastCtrl.create({
+        message: 'Imagen lista. Recuerda guardar el formulario.',
+        duration: 2200,
+        color: 'success',
+      });
+      await toast.present();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '';
+      if (message === 'USER_CANCELLED' || message.includes('cancel')) {
+        return;
+      }
+      const toast = await this.toastCtrl.create({
+        message: message || 'No se pudo cargar la imagen.',
+        duration: 3200,
+        color: 'danger',
+      });
+      await toast.present();
+    } finally {
+      this.busy.set(false);
     }
   }
 
