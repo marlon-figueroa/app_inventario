@@ -3,7 +3,7 @@
     <ion-toolbar>
       <ion-title>Movimientos</ion-title>
     </ion-toolbar>
-    <ion-toolbar>
+    <ion-toolbar class="movement-filters">
       <ion-select
         placeholder="Tipo"
         interface="popover"
@@ -30,9 +30,9 @@
   </ion-header>
 }
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="!embedded()">
   @if (embedded()) {
-    <ion-toolbar>
+    <ion-toolbar class="movement-filters">
       <ion-select
         placeholder="Tipo"
         interface="popover"

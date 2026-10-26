@@ -33,6 +33,9 @@ import { StockMovementService } from './stock-movement.service';
   selector: 'app-movements',
   templateUrl: './movements.page.html',
   styleUrls: ['./movements.page.scss'],
+  host: {
+    '[class.movements-embedded]': 'embedded()',
+  },
   imports: [
     IonHeader,
     IonToolbar,

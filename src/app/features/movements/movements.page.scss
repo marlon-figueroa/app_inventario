@@ -1,3 +1,26 @@
+.movement-filters ion-select {
+  width: calc(100% - 10px);
+  max-width: calc(100% - 10px);
+  margin-inline: auto;
+  --padding-start: 5px;
+  --padding-end: 5px;
+}
+
+.movement-filters ion-select::part(container) {
+  margin-inline: auto;
+  max-width: 100%;
+  min-width: 0;
+}
+
+:host(.movements-embedded) {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-self: stretch;
+  min-height: 0;
+  width: 100%;
+}
+
 .empty {
   display: flex;
   flex-direction: column;
